@@ -13,27 +13,6 @@
  */
 package org.codice.ddf.security.servlet.logout;
 
-import static org.boon.Boon.toJson;
-
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.Subject.Builder;
-
 import ddf.action.Action;
 import ddf.action.ActionProvider;
 import ddf.security.SecurityConstants;
@@ -41,6 +20,25 @@ import ddf.security.SubjectUtils;
 import ddf.security.assertion.impl.SecurityAssertionImpl;
 import ddf.security.common.util.SecurityTokenHolder;
 import ddf.security.http.SessionFactory;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.subject.Subject.Builder;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import static org.boon.Boon.toJson;
 
 @Path("/")
 public class LogoutService {
@@ -56,6 +54,8 @@ public class LogoutService {
         //TODO: Update docs for idp realm changes. Also add documentation about the rollback of other poliy manager shizz
         //TODO: look for incorrect DDF version
         //TODO: Make sure iframe has a scrollbar
+        //TODO: make a class that extends action for our purposes
+        //TODO: make search and admin show
 
         HttpSession session = httpSessionFactory.getOrCreateSession(request);
         Map<String, SecurityToken> realmTokenMap = ((SecurityTokenHolder) session.getAttribute(SecurityConstants.SAML_ASSERTION)).getRealmTokenMap();
