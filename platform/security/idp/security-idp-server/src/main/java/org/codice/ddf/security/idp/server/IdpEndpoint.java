@@ -676,61 +676,7 @@ public class IdpEndpoint implements Idp {
             @QueryParam(SSOConstants.SIG_ALG) final String signatureAlgorithm,
             @QueryParam(SSOConstants.SIGNATURE) final String signature,
             @Context final HttpServletRequest request) throws WSSecurityException, IdpException {
-        String samlRequestDecoded;
-        String samlToValidate;
-        // TODO (RCZ) - refactor so this is nice and not carp
-        try {
-            if (samlRequest != null) {
-                samlRequestDecoded = RestSecurity.inflateBase64(samlRequest);
-                samlToValidate = samlRequest;
-            } else if (samlResponse != null) {
-                samlRequestDecoded = RestSecurity.inflateBase64(samlResponse);
-                samlToValidate = samlResponse;
-            } else {
-                throw new IdpException("No SAML object received");
-            }
-        } catch (IOException e) {
-            throw new IdpException(e);
-        }
 
-        final String fSamlToValidate = samlToValidate;
-        final String finalSaml = samlRequestDecoded;
-        RedirectBinding binding = new RedirectBinding(systemCrypto, serviceProviders);
-
-        /* Note this is a Lambda used to validate saml (closing over above variables) */
-        BiConsumer<String, SignableSAMLObject> validator = (issuer, samlObject) -> {
-            LOGGER.debug("Validating AuthnRequest required attributes and signature");
-            try {
-                if (isEmpty(signature) || isEmpty(signatureAlgorithm) || isEmpty(issuer)) {
-                    throw new ValidationException("No signature present for AuthnRequest.");
-                }
-                String signingCertificate = serviceProviders.get(issuer)
-                        .getSigningCertificate();
-
-                new SamlValidator.Builder(new SimpleSign(systemCrypto)).setRedirectParams(relayState,
-                        signature,
-                        signatureAlgorithm,
-                        fSamlToValidate,
-                        signingCertificate)
-                        .buildAndValidate(request.getRequestURL()
-                                .toString(), SamlProtocol.Binding.HTTP_REDIRECT, samlObject);
-            } catch (ValidationException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        try {
-            return processLogout(request,
-                    finalSaml,
-                    relayState,
-                    binding,
-                    SamlProtocol.Binding.HTTP_REDIRECT,
-                    validator);
-        } catch (RuntimeException e) {
-            LOGGER.debug("Error processing saml request", e);
-        }
-
-        /* THIS IS THE OLD CODE BARRIER ----------------------------------------------------- */
         LogoutState logoutState = getLogoutState(request);
         Cookie cookie = getCookie(request);
 
@@ -805,89 +751,48 @@ public class IdpEndpoint implements Idp {
     @Override
     @POST
     @Path("/logout")
-    public Response processPostLogout(@FormParam(SAML_REQ) String samlRequest,
-            @FormParam(SAML_RESPONSE) String samlResponse,
-            @FormParam(RELAY_STATE) String relayState, @Context HttpServletRequest request)
-            throws WSSecurityException, IdpException {
-        PostBinding binding = new PostBinding(systemCrypto, serviceProviders);
-        String samlRequestDecoded;
+    public Response processPostLogout(@FormParam(SAML_REQ) final String samlRequest,
+            @FormParam(SAML_RESPONSE) final String samlResponse,
+            @FormParam(RELAY_STATE) final String relayState,
+            @Context final HttpServletRequest request) throws WSSecurityException, IdpException {
+        LogoutState logoutState = getLogoutState(request);
+        Cookie cookie = getCookie(request);
         try {
             if (samlRequest != null) {
-                samlRequestDecoded = RestSecurity.inflateBase64(samlRequest);
-            } else if (samlResponse != null) {
-                samlRequestDecoded = RestSecurity.inflateBase64(samlResponse);
-            } else {
-                throw new IdpException("No SAML object received");
-            }
-        } catch (IOException e) {
-            throw new IdpException(e);
-        }
-        return processLogout(request,
-                samlRequestDecoded,
-                relayState,
-                binding,
-                SamlProtocol.Binding.HTTP_POST,
-                (issuer, samlObject) -> {
-                    LOGGER.debug("Validating AuthnRequest required attributes and signature");
-                    try {
-                        new SamlValidator.Builder(new SimpleSign(systemCrypto)).buildAndValidate(
-                                request.getRequestURL()
-                                        .toString(),
-                                SamlProtocol.Binding.HTTP_POST,
-                                samlObject);
-                    } catch (ValidationException e) {
-                        throw new RuntimeException("Unable to validate object", e);
-                    }
-                });
-
-    }
-
-    private Response processLogout(final HttpServletRequest request, final String samlRequest,
-            String relayState, Binding binding, SamlProtocol.Binding incomingBinding,
-            BiConsumer<String, SignableSAMLObject> signatureValidator) throws IdpException {
-        // TODO (RCZ) - if ID present in req, must include InResponseTo
-        try {
-            LogoutState logoutState = getLogoutState(request);
-            Cookie cookie = getCookie(request);
-            SignableSAMLObject logoutObject = logoutService.extractXmlObject(samlRequest);
-            binding.validator()
-                    .validateRelayState(relayState);
-
-            if (logoutObject instanceof LogoutRequest) {
-                // LogoutRequest is the initial request coming from the SP that initiated the chain
-                LogoutRequest logoutRequest = ((LogoutRequest) logoutObject);
-                if (strictSignature) {
-                    signatureValidator.accept(logoutRequest.getIssuer()
-                            .getValue(), logoutObject);
-                }
+                LogoutRequest logoutRequest =
+                        logoutService.extractSamlLogoutRequest(RestSecurity.inflateBase64(
+                                samlRequest));
+                validatePost(request, logoutRequest);
                 return handleLogoutRequest(cookie,
                         logoutState,
-                        (LogoutRequest) logoutObject,
-                        incomingBinding,
+                        logoutRequest,
+                        SamlProtocol.Binding.HTTP_POST,
                         relayState);
-
-            } else if (logoutObject instanceof LogoutResponse) {
-                // LogoutResponse is one of the SP's responding to the logout request
-                LogoutResponse logoutResponse = ((LogoutResponse) logoutObject);
-                if (strictSignature) {
-                    signatureValidator.accept(logoutResponse.getIssuer()
-                            .getValue(), logoutObject);
-                }
+            } else if (samlResponse != null) {
+                LogoutResponse logoutResponse =
+                        logoutService.extractSamlLogoutResponse(RestSecurity.inflateBase64(
+                                samlResponse));
+                validatePost(request, logoutResponse);
                 return handleLogoutResponse(cookie,
                         logoutState,
-                        (LogoutResponse) logoutObject,
-                        incomingBinding);
-
-            } else { // Unsupported object type
-
-                return continueLogout(logoutState, cookie, incomingBinding);
+                        logoutResponse,
+                        SamlProtocol.Binding.HTTP_POST);
             }
-        } catch (XMLStreamException e) {
-            LOGGER.error("Unable to extract Saml object", e);
-        } catch (WSSecurityException e) {
-            // TODO (RCZ) - exception
+        } catch (IOException | XMLStreamException e) {
+            throw new IdpException("Unable to inflate Saml Object", e);
+        } catch (ValidationException e) {
+            throw new IdpException("Unable to validate Saml Object", e);
         }
-        return null;
+
+        throw new IdpException("Unable to process logout");
+    }
+
+    void validatePost(HttpServletRequest request, SignableSAMLObject samlObject)
+            throws ValidationException {
+        if (strictSignature) {
+            new SamlValidator.Builder(new SimpleSign(systemCrypto)).buildAndValidate(request.getRequestURL()
+                    .toString(), SamlProtocol.Binding.HTTP_POST, samlObject);
+        }
     }
 
     private Response handleLogoutResponse(Cookie cookie, LogoutState logoutState,
@@ -903,14 +808,14 @@ public class IdpEndpoint implements Idp {
     Response handleLogoutRequest(Cookie cookie, LogoutState logoutState,
             LogoutRequest logoutRequest, SamlProtocol.Binding incomingBinding, String relayState)
             throws IdpException {
-        // Initial Logout Request
         if (logoutState != null) {
             // this means that they have a logout in progress and resent another logout
             // request. Either that or we have an old LogoutState which could happen if
             // a logout never actually finished
+            // TODO (RCZ) - What should we do here?
             LOGGER.error(
                     "This is a wierd state.. should be initial but already logout request in prog");
-            // throw new IllegalStateException("Weird state");
+            throw new IllegalStateException("Weird state");
         }
 
         logoutState = new LogoutState(getActiveSps(cookie.getValue()));
@@ -928,6 +833,7 @@ public class IdpEndpoint implements Idp {
 
     private Response continueLogout(LogoutState logoutState, Cookie cookie,
             SamlProtocol.Binding incomingBinding) throws IdpException {
+        // TODO (RCZ) - if ID present in req, must include InResponseTo
         if (logoutState == null) {
             throw new IdpException("Cannot continue a Logout that doesn't exist!");
         }
