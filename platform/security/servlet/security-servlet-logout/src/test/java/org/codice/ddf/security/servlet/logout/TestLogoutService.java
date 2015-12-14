@@ -13,22 +13,6 @@
  */
 package org.codice.ddf.security.servlet.logout;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-
-import javax.servlet.http.HttpSession;
-
-import org.apache.tika.io.IOUtils;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
 import ddf.action.Action;
 import ddf.security.SecurityConstants;
 import ddf.security.common.util.SecurityTokenHolder;
@@ -37,6 +21,21 @@ import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;
+import org.apache.tika.io.IOUtils;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import javax.servlet.http.HttpSession;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class TestLogoutService {
 
@@ -57,12 +56,13 @@ public class TestLogoutService {
     @Ignore // TODO (RCZ) - below
     @Test   // TODO (TEB) - Tracy fix this test
     public void testLogout() throws IOException, ParseException {
-        LocalLogoutAction localLogoutAction = new LocalLogoutAction();
-        Action logoutAction = localLogoutAction.getAction(null);
+        KarafLogoutAction karafLogoutAction = new KarafLogoutAction();
+        Action logoutAction = karafLogoutAction.getAction(null);
 
         LogoutService logoutService = new LogoutService();
         logoutService.setHttpSessionFactory(sessionFactory);
-        logoutService.setLogoutActionProviders(Collections.singletonList(localLogoutAction));
+        logoutService.setLogoutActionProviders(Arrays.asList(karafLogoutAction));
+        logoutService.setLogoutActionProviders(Collections.singletonList(karafLogoutAction));
 
         String responseMessage =
                 IOUtils.toString((ByteArrayInputStream) logoutService.getActionProviders(null)
@@ -76,7 +76,7 @@ public class TestLogoutService {
         assertEquals(actionProperty.get("realm"),
                 logoutAction.getId()
                         .substring(logoutAction.getId()
-                                        .lastIndexOf(".") + 1));
+                                .lastIndexOf(".") + 1));
         assertEquals(actionProperty.get("title"), logoutAction.getTitle());
         assertEquals(actionProperty.get("url"),
                 logoutAction.getUrl()

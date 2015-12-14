@@ -13,24 +13,6 @@
  */
 package org.codice.ddf.security.servlet.logout;
 
-import static org.boon.Boon.toJson;
-
-import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.shiro.subject.Subject;
-
 import ddf.action.Action;
 import ddf.action.ActionProvider;
 import ddf.security.SecurityConstants;
@@ -39,6 +21,23 @@ import ddf.security.common.util.SecurityTokenHolder;
 import ddf.security.http.SessionFactory;
 import ddf.security.service.SecurityManager;
 import ddf.security.service.SecurityServiceException;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.shiro.subject.Subject;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.boon.Boon.toJson;
 
 @Path("/")
 public class LogoutService {
@@ -54,8 +53,6 @@ public class LogoutService {
     public Response getActionProviders(@Context HttpServletRequest request) {
 
         //TODO: Update docs for idp realm changes. Also add documentation about the rollback of other poliy manager shizz
-        //TODO: look for incorrect DDF version
-        //TODO: Make sure iframe has a scrollbar
 
         HttpSession session = httpSessionFactory.getOrCreateSession(request);
         Map<String, SecurityToken> realmTokenMap = ((SecurityTokenHolder) session.getAttribute(
@@ -76,23 +73,24 @@ public class LogoutService {
 
         for (ActionProvider actionProvider : logoutActionProviders) {
             Action action = actionProvider.getAction(realmSubjectMap);
-            String realm = action.getId()
-                    .substring(action.getId()
-                            .lastIndexOf(".")
-                            + 1); //StringUtils.substringAfterLast(action.getId(), ".");
-            // TODO (RCZ) - Do above afer importing common-lang
+            String realm = StringUtils.substringAfterLast(action.getId(), ".");
+
+            //if the user is logged in and isn't a guest, add them
             if (realmTokenMap.get(realm) != null) {
-                Map<String, String> actionProperties = new HashMap<String, String>();
-                actionProperties.put("title", action.getTitle());
-                actionProperties.put("realm", realm);
-                actionProperties.put("auth", SubjectUtils.getName(realmSubjectMap.get(realm),
-                        "",
-                        true));
-                actionProperties.put("description", action.getDescription());
-                actionProperties.put("url",
-                        action.getUrl()
-                                .toString());
-                realmToPropMaps.add(actionProperties);
+                Map<String, String> actionProperties = new HashMap<>();
+                String displayName = SubjectUtils.getName(realmSubjectMap.get(realm), "", true);
+
+
+                if (displayName != null && !displayName.equals(SubjectUtils.GUEST_DISPLAY_NAME)) {
+                    actionProperties.put("title", action.getTitle());
+                    actionProperties.put("realm", realm);
+                    actionProperties.put("auth", displayName);
+                    actionProperties.put("description", action.getDescription());
+                    actionProperties.put("url",
+                            action.getUrl()
+                                    .toString());
+                    realmToPropMaps.add(actionProperties);
+                }
             }
         }
 

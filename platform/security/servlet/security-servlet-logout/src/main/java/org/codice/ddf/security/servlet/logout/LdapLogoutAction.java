@@ -13,27 +13,25 @@
  */
 package org.codice.ddf.security.servlet.logout;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-
+import ddf.action.Action;
+import ddf.action.ActionProvider;
+import ddf.action.impl.ActionImpl;
 import org.codice.ddf.configuration.SystemBaseUrl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ddf.action.Action;
-import ddf.action.ActionProvider;
-import ddf.action.impl.ActionImpl;
+import java.net.MalformedURLException;
+import java.net.URL;
 
-public class LocalLogoutAction implements ActionProvider {
+public class LdapLogoutAction implements ActionProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(LocalLogoutAction.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KarafLogoutAction.class);
 
-    private static final String ID = "security.logout.karaf";
+    private static final String ID = "security.logout.ldap";
 
-    private static final String TITLE = "Local Logout";
+    private static final String TITLE = "Ldap Logout";
 
-    private static final String DESCRIPTION =
-            "Logging out of the karaf realm will only perform a local logout. Accounts signed into external sources will remain logged in.";
+    private static final String DESCRIPTION = "Logging out of the ldap realm will also log you out of the karaf realm. Accounts signed into external sources will remain logged in.";
 
     private static URL logoutUrl = null;
 
@@ -41,8 +39,7 @@ public class LocalLogoutAction implements ActionProvider {
         try {
             logoutUrl = new URL(new SystemBaseUrl().constructUrl("/logout/local"));
         } catch (MalformedURLException e) {
-            LOGGER.info("Unable to resolve URL: {}", new SystemBaseUrl().constructUrl(
-                    "/logout/local"));
+            LOGGER.info("Unable to resolve URL: {}", new SystemBaseUrl().constructUrl("/logout/local"));
         }
     }
 

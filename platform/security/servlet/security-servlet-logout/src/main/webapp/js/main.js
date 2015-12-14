@@ -1,60 +1,52 @@
-//- Alert Hellllllo world?
-//- Get logout actions /services/logout/actions
-//- Render UI
-//    - Buttons based on logout actions
-//    - Display home and go back buttons
-//- Setup events for when user clicks them butts
-//- Load url of button to iFrame
-//- Auto logout if only signed in one place
+$('#modal').on('click',function(){
+    $(this).addClass('is-hidden');
+                    window.top.location.reload();
 
-
-$(function () {
-    $('#go-back').click(function(){
-        window.history.back();
-    });
 });
 
-$.get("/services/logout/actions", function (data) {
-    console.log(data);
+$.get("/services/platform/config/ui", function(data){
+    $('#nav img').attr('src', "data:image/png;base64,"+data.productImage);
+});
+
+$.get("/services/logout/actions", function (data){
 
     var actions = JSON.parse(data);
-    if (actions.length === 0) {
-        $('<h2>').text('You are not currently logged in.').appendTo('#logouts');
+
+    if(actions.length === 0) {
+        $("#actions").replaceWith($('iframe').attr('src', '/logout/logout-response.html?msg=You+are+not+logged+in'));
     }
-    var logoutDivs = actions.map(function (action) {
-        var div = $('<div>').addClass('row');
-        
-        $('<div>')
-            .addClass('col-md-4')
-            .addClass('med-font')
-            .text('Logged in as ' + action.auth + ' in ' + action.realm)
-            .appendTo(div);
-
-        $('<div>')
-            .addClass('col-md-4')
-            .text('Description: ' + action.description)
-            .appendTo(div);
+    else {
+        $('#noActions').toggleClass('is-hidden', actions.length!==0);
+        $('#actions').toggleClass('is-hidden', actions.length===0);
 
 
-        var button = $('<button>').text('Logout')
-            .addClass('btn btn-primary float-right')
-            .click(function () {
-                $('<iframe>').attr('src', action.url).addClass('iframe-fill').appendTo(div);
-                button.attr('disabled', true);
-            });
+        actions.forEach(function(action){
+            var $row = $('<tr></tr>');
+            var $realm = $('<td></td>');
+            $realm.html(action.realm);
+            var $realmDescription = $('<a href="#" class="description" tabindex="-1"></a>');
+            $realmDescription.data('title',action.description);
+            $realmDescription.data('placement','right');
+            $realmDescription.append($('<i class="glyphicon glyphicon-question-sign"></i>'));
+            $realm.append($realmDescription);
+            var $user = $('<td></td>');
+            $user.html(action.auth);
+            var $logout = $('<td></td>');
+            var $button = $('<button>').text('Logout')
+                                      .addClass('btn btn-primary float-right')
+                                      .click(function () {
+                                            $('iframe').attr('src',action.url);
+                                            $('#modal').removeClass('is-hidden');
 
-        $('<div>')
-            .addClass('col-md-4 text-right')
-            .append(button)
-            .appendTo(div);
+                                      });
+            $logout.append($button);
+            $row.append($realm).append($user).append($logout);
+            $('#actions tbody').append($row);
+        });
 
-        return div;
-    });
+                    $('.description').tooltip();
 
-    $('#logouts').append(logoutDivs);
-
-    //TODO: Uncomment
-    /*if (logoutDivs.length === 1) {
-        logoutDivs[0].find('button').click();
-    }*/
+    }
 });
+
+

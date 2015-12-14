@@ -19,9 +19,17 @@
 
     <service interface="ddf.action.ActionProvider">
         <service-properties>
-            <entry key="id" value="security.logout.local"/>
+            <entry key="id" value="security.logout.karaf"/>
         </service-properties>
-        <bean class="org.codice.ddf.security.servlet.logout.LocalLogoutAction">
+        <bean class="org.codice.ddf.security.servlet.logout.KarafLogoutAction">
+        </bean>
+    </service>
+
+    <service interface="ddf.action.ActionProvider">
+        <service-properties>
+            <entry key="id" value="security.logout.ldap"/>
+        </service-properties>
+        <bean class="org.codice.ddf.security.servlet.logout.LdapLogoutAction">
         </bean>
     </service>
 

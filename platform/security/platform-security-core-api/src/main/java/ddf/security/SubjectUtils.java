@@ -13,18 +13,16 @@
  */
 package ddf.security;
 
-import java.security.Principal;
-import java.util.StringTokenizer;
-
-import javax.security.auth.kerberos.KerberosPrincipal;
-import javax.security.auth.x500.X500Principal;
-
+import ddf.security.assertion.SecurityAssertion;
+import ddf.security.principal.GuestPrincipal;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ddf.security.assertion.SecurityAssertion;
-import ddf.security.principal.GuestPrincipal;
+import javax.security.auth.kerberos.KerberosPrincipal;
+import javax.security.auth.x500.X500Principal;
+import java.security.Principal;
+import java.util.StringTokenizer;
 
 /**
  * Utility class used to perform operations on Subjects.
@@ -32,6 +30,8 @@ import ddf.security.principal.GuestPrincipal;
 public final class SubjectUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SubjectUtils.class);
+
+    public static final String GUEST_DISPLAY_NAME = "Guest";
 
     private SubjectUtils() {
 
@@ -49,7 +49,7 @@ public final class SubjectUtils {
         String displayName = defaultName;
 
         if (principal instanceof GuestPrincipal) {
-            displayName = "Guest";
+            displayName = GUEST_DISPLAY_NAME;
         } else if (principal instanceof X500Principal) {
             getCommonName((X500Principal) principal);
         } else {

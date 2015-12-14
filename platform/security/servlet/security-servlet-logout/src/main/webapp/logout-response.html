@@ -17,30 +17,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Console</title>
+    <title>Logout Response</title>
+    <script src="/logout/lib/jquery/jquery.min.js"></script>
     <meta http-equiv="x-ua-compatible" content="IE=Edge"/>
-    <style>
-        body {
-            font-family: Lato,"Helvetica Neue",Helvetica,Arial,sans-serif;
-        }
-        .container {
-            border: solid 5px #ecf0f1;
-            border-radius: 30px;
-            padding: 10px;
-        }
-        .logout-msg {
-            text-align: center;
-            font-size: 200%;
-            left: 40px;
-            top: 57px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="/logout/css/style.css">
 </head>
-<body>
-    <div class="container">
-        <div class="logout-msg">
-            You have successfully logged out.
-        </div>
+<body class="logout-response-body">
+<div class="logout-response-container">
+    <div class="logout-msg">
+        Successfully logged out
     </div>
+</div>
+<script src="js/logout-response.js"></script>
 </body>
 </html>

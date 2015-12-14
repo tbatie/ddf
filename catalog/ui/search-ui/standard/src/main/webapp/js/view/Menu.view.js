@@ -340,11 +340,7 @@ define([
             this.$('#loginError').hide();
         },
         deleteCookie: function() {
-            $.ajax({
-                type: "GET",
-                url: '/logout',
-                async: false
-            });
+            document.cookie = "JSESSIONID=;path=/;domain=;expires=Thu, 01 Jan 1970 00:00:00 GMT;secure";
         }
     });
 

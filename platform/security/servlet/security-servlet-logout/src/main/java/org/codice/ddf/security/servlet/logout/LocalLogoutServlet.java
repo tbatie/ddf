@@ -13,19 +13,23 @@
  */
 package org.codice.ddf.security.servlet.logout;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import ddf.security.SecurityConstants;
 import ddf.security.common.util.SecurityTokenHolder;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicNameValuePair;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.*;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 
 public class LocalLogoutServlet extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -33,21 +37,42 @@ public class LocalLogoutServlet extends HttpServlet {
         response.setHeader("Pragma", "no-cache");
         response.setContentType("text/html");
 
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            SecurityTokenHolder savedToken = (SecurityTokenHolder) session.getAttribute(
-                    SecurityConstants.SAML_ASSERTION);
-            if (savedToken != null) {
-                savedToken.removeAll();
-            }
-            session.invalidate();
-            deleteJSessionId(response);
-        }
+        URIBuilder redirectUrlBuilder = null;
+        List<NameValuePair> params = new ArrayList<>();
 
-        //Redirect to logout success page
-        getServletContext().getContext("/logout")
-                .getRequestDispatcher("/local-logout-successful.html")
-                .forward(request, response);
+        try {
+            redirectUrlBuilder = new URIBuilder("/logout/logout-response.html");
+
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                SecurityTokenHolder savedToken = (SecurityTokenHolder) session.getAttribute(
+                        SecurityConstants.SAML_ASSERTION);
+                if (savedToken != null) {
+                    savedToken.removeAll();
+                }
+                session.invalidate();
+                deleteJSessionId(response);
+            }
+
+            //Check for pki
+            if (request.getAttribute("javax.servlet.request.X509Certificate") != null &&
+                    ((X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate")).length > 0) {
+                params.add(new BasicNameValuePair("msg", "Please close your browser to finish logging out"));
+            }
+
+            //Check for basic
+            Enumeration authHeaders = request.getHeaders(javax.ws.rs.core.HttpHeaders.AUTHORIZATION);
+            while (authHeaders.hasMoreElements()) {
+                if (((String) authHeaders.nextElement()).contains("Basic")) {
+                    params.add(new BasicNameValuePair("msg", "Please close your browser to finish logging out"));
+                    break;
+                }
+            }
+            redirectUrlBuilder.addParameters(params);
+            response.sendRedirect(redirectUrlBuilder.build().toString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     private void deleteJSessionId(HttpServletResponse response) {

@@ -13,16 +13,9 @@
  */
 package org.codice.ddf.security.servlet.logout;
 
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import ddf.security.SecurityConstants;
+import ddf.security.common.util.SecurityTokenHolder;
+import org.junit.Test;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -30,13 +23,17 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Enumeration;
 
-import org.junit.Test;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Mockito.*;
 
-import ddf.security.SecurityConstants;
-import ddf.security.common.util.SecurityTokenHolder;
-
-public class TestLocalLogoutServlet {
+public class TestKarafLogoutServlet {
     @Test
     public void testLocalLogout() {
 
@@ -53,6 +50,17 @@ public class TestLocalLogoutServlet {
         when(request.getSession(anyBoolean())
                 .getId()).thenReturn("id");
         when(request.getRequestURL()).thenReturn(new StringBuffer("http://foo.bar"));
+        when(request.getHeaders(anyString())).thenReturn(new Enumeration() {
+            @Override
+            public boolean hasMoreElements() {
+                return false;
+            }
+
+            @Override
+            public Object nextElement() {
+                return null;
+            }
+        });
         SecurityTokenHolder securityTokenHolder = mock(SecurityTokenHolder.class);
         when(httpSession.getAttribute(SecurityConstants.SAML_ASSERTION)).thenReturn(
                 securityTokenHolder);
