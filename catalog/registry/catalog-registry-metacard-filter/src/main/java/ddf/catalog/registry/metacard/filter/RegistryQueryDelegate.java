@@ -14,11 +14,11 @@
 
 package ddf.catalog.registry.metacard.filter;
 
-import java.util.Date;
-import java.util.List;
-
 import ddf.catalog.data.Metacard;
 import ddf.catalog.filter.FilterDelegate;
+
+import java.util.Date;
+import java.util.List;
 
 public class RegistryQueryDelegate extends FilterDelegate<Boolean> {
 
@@ -65,53 +65,7 @@ public class RegistryQueryDelegate extends FilterDelegate<Boolean> {
                 RegistryMetacardFilterPlugin.REGISTRY_CONTENT_TYPE);
     }
 
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, Date literal) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, Date startDate, Date endDate) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, int literal) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, short literal) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, long literal) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, float literal) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, double literal) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, boolean literal) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, byte[] literal) {
-        return false;
-    }
-
-    @Override
-    public Boolean propertyIsEqualTo(String propertyName, Object literal) {
+    public Boolean propertyIsEqualTo(String propertyName,  Object literal) {
         return false;
     }
 

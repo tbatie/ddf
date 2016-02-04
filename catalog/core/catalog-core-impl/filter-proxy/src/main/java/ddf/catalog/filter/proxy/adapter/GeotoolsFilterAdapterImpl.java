@@ -13,80 +13,26 @@
  */
 package ddf.catalog.filter.proxy.adapter;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
-import org.geotools.filter.FilterFactoryImpl;
-import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
-import org.geotools.styling.UomOgcMapping;
-import org.geotools.temporal.object.DefaultPeriodDuration;
-import org.opengis.filter.And;
-import org.opengis.filter.BinaryComparisonOperator;
-import org.opengis.filter.ExcludeFilter;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.FilterVisitor;
-import org.opengis.filter.Id;
-import org.opengis.filter.IncludeFilter;
-import org.opengis.filter.Not;
-import org.opengis.filter.Or;
-import org.opengis.filter.PropertyIsBetween;
-import org.opengis.filter.PropertyIsEqualTo;
-import org.opengis.filter.PropertyIsGreaterThan;
-import org.opengis.filter.PropertyIsGreaterThanOrEqualTo;
-import org.opengis.filter.PropertyIsLessThan;
-import org.opengis.filter.PropertyIsLessThanOrEqualTo;
-import org.opengis.filter.PropertyIsLike;
-import org.opengis.filter.PropertyIsNil;
-import org.opengis.filter.PropertyIsNotEqualTo;
-import org.opengis.filter.PropertyIsNull;
-import org.opengis.filter.expression.Add;
-import org.opengis.filter.expression.Divide;
-import org.opengis.filter.expression.Expression;
-import org.opengis.filter.expression.ExpressionVisitor;
-import org.opengis.filter.expression.Function;
-import org.opengis.filter.expression.Literal;
-import org.opengis.filter.expression.Multiply;
-import org.opengis.filter.expression.NilExpression;
-import org.opengis.filter.expression.PropertyName;
-import org.opengis.filter.expression.Subtract;
-import org.opengis.filter.spatial.BBOX;
-import org.opengis.filter.spatial.Beyond;
-import org.opengis.filter.spatial.BinarySpatialOperator;
-import org.opengis.filter.spatial.Contains;
-import org.opengis.filter.spatial.Crosses;
-import org.opengis.filter.spatial.DWithin;
-import org.opengis.filter.spatial.Disjoint;
-import org.opengis.filter.spatial.Equals;
-import org.opengis.filter.spatial.Intersects;
-import org.opengis.filter.spatial.Overlaps;
-import org.opengis.filter.spatial.Touches;
-import org.opengis.filter.spatial.Within;
-import org.opengis.filter.temporal.After;
-import org.opengis.filter.temporal.AnyInteracts;
-import org.opengis.filter.temporal.Before;
-import org.opengis.filter.temporal.Begins;
-import org.opengis.filter.temporal.BegunBy;
-import org.opengis.filter.temporal.BinaryTemporalOperator;
-import org.opengis.filter.temporal.During;
-import org.opengis.filter.temporal.EndedBy;
-import org.opengis.filter.temporal.Ends;
-import org.opengis.filter.temporal.Meets;
-import org.opengis.filter.temporal.MetBy;
-import org.opengis.filter.temporal.OverlappedBy;
-import org.opengis.filter.temporal.TContains;
-import org.opengis.filter.temporal.TEquals;
-import org.opengis.filter.temporal.TOverlaps;
-import org.opengis.temporal.Instant;
-import org.opengis.temporal.Period;
-
 import ddf.catalog.filter.FilterAdapter;
 import ddf.catalog.filter.FilterDelegate;
 import ddf.catalog.impl.filter.FuzzyFunction;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.measure.Distance;
 import ddf.measure.Distance.LinearUnit;
+import org.geotools.filter.FilterFactoryImpl;
+import org.geotools.geometry.jts.spatialschema.geometry.GeometryImpl;
+import org.geotools.styling.UomOgcMapping;
+import org.geotools.temporal.object.DefaultPeriodDuration;
+import org.opengis.filter.*;
+import org.opengis.filter.expression.*;
+import org.opengis.filter.spatial.*;
+import org.opengis.filter.temporal.*;
+import org.opengis.temporal.Instant;
+import org.opengis.temporal.Period;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, ExpressionVisitor {
 
@@ -237,9 +183,11 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
                     "Only support PropertyName for expression and Literal for upper and lower boundaries with PropertyIsBetween filter.");
         }
 
-        if (lower instanceof String && upper instanceof String) {
-            return ((FilterDelegate<?>) delegate)
-                    .propertyIsBetween(propertyName, (String) lower, (String) upper);
+        if(isXpathSearch(propertyName)) {
+            return ((FilterDelegate<?>) delegate).xpathIsBetween(propertyName, lower, upper);
+        }
+        else if(lower instanceof String && upper instanceof String) {
+            return ((FilterDelegate<?>) delegate).propertyIsBetween(propertyName, (String) lower, (String) upper);
         } else if (lower instanceof Date && upper instanceof Date) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsBetween(propertyName, (Date) lower, (Date) upper);
@@ -277,41 +225,53 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
         String propertyName = filterValues.propertyName;
         Object literal = filterValues.literal;
 
+        if(isXpathSearch(propertyName)) {
+            return ((FilterDelegate<?>) delegate).xpathIsEqualTo(propertyName, filter);
+        }
         if (literal instanceof String) {
-            return ((FilterDelegate<?>) delegate)
-                    .propertyIsEqualTo((String) propertyName, (String) literal,
-                            filter.isMatchingCase());
+            return ((FilterDelegate<?>) delegate).propertyIsEqualTo((String) propertyName, (String) literal, filter.isMatchingCase());
+
         } else if (literal instanceof Date) {
-            return ((FilterDelegate<?>) delegate)
-                    .propertyIsEqualTo((String) propertyName, (Date) literal);
+            return
+            ((FilterDelegate<?>) delegate).propertyIsEqualTo((String) propertyName, (Date) literal);
+
         } else if (literal instanceof Instant) {
-            return ((FilterDelegate<?>) delegate)
-                    .propertyIsEqualTo(propertyName, ((Instant) literal).getPosition().getDate());
+            return
+            ((FilterDelegate<?>) delegate).propertyIsEqualTo(propertyName, ((Instant) literal).getPosition().getDate());
+
         } else if (literal instanceof Period) {
             return ((FilterDelegate<?>) delegate).propertyIsEqualTo(propertyName,
                     ((Period) literal).getBeginning().getPosition().getDate(),
                     ((Period) literal).getEnding().getPosition().getDate());
+
         } else if (literal instanceof Integer) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsEqualTo((String) propertyName, ((Integer) literal).intValue());
+
         } else if (literal instanceof Short) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsEqualTo((String) propertyName, ((Short) literal).shortValue());
+
         } else if (literal instanceof Long) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsEqualTo((String) propertyName, ((Long) literal).longValue());
+
         } else if (literal instanceof Float) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsEqualTo((String) propertyName, ((Float) literal).floatValue());
+
         } else if (literal instanceof Double) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsEqualTo((String) propertyName, ((Double) literal).doubleValue());
+
         } else if (literal instanceof Boolean) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsEqualTo((String) propertyName, ((Boolean) literal).booleanValue());
+
         } else if (literal instanceof byte[]) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsEqualTo((String) propertyName, (byte[]) literal);
+
         } else {
             return ((FilterDelegate<?>) delegate).propertyIsEqualTo((String) propertyName, literal);
         }
@@ -323,7 +283,11 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
         String propertyName = filterValues.propertyName;
         Object literal = filterValues.literal;
 
-        if (literal instanceof String) {
+        if(isXpathSearch(propertyName)) {
+            return ((FilterDelegate<?>) delegate)
+                    .xpathIsNotEqualTo((String) propertyName, filter);
+        }
+        else if (literal instanceof String) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsNotEqualTo((String) propertyName, (String) literal,
                             filter.isMatchingCase());
@@ -370,6 +334,8 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
         String propertyName = filterValues.propertyName;
         Object literal = filterValues.literal;
 
+
+        // TODO: tbatie - 2/3/16 - Is it okay if xpath gets executed after this check?
         // Are property name and literal reversed?
         if (filter.getExpression1() instanceof Literal) {
             // convert literal > property to property < literal
@@ -377,7 +343,11 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
             return lessThan.accept(this, delegate);
         }
 
-        if (literal instanceof String) {
+        if(isXpathSearch(propertyName)) {
+            return ((FilterDelegate<?>) delegate)
+                    .xpathIsGreaterThan(propertyName, filter);
+        }
+        else if (literal instanceof String) {
             return ((FilterDelegate<?>) delegate)
                     .propertyIsGreaterThan(propertyName, (String) literal);
         } else if (literal instanceof Date) {
@@ -414,6 +384,7 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
         String propertyName = filterValues.propertyName;
         Object literal = filterValues.literal;
 
+        // TODO: tbatie - 2/3/16 - Is it okay if xpath gets executed after this check?
         // Are property name and literal reversed?
         if (filter.getExpression1() instanceof Literal) {
             // convert literal >= property to property <= literal
@@ -459,6 +430,7 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
         String propertyName = filterValues.propertyName;
         Object literal = filterValues.literal;
 
+        // TODO: tbatie - 2/3/16 - Is it okay if xpath gets executed after this check?
         // Are property name and literal reversed?
         if (filter.getExpression1() instanceof Literal) {
             // convert literal < property to property > literal
@@ -502,6 +474,7 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
         String propertyName = filterValues.propertyName;
         Object literal = filterValues.literal;
 
+        // TODO: tbatie - 2/3/16 - Is it okay if xpath gets executed after this check?
         // Are property name and literal reversed?
         if (filter.getExpression1() instanceof Literal) {
             // convert literal <= property to property >= literal
@@ -580,8 +553,7 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
                     "Only support PropertyName expression for PropertyIsLike filter.");
         }
 
-        boolean isXpathSearch = (propertyName.indexOf('/') != -1
-                || propertyName.indexOf('@') != -1);
+        boolean isXpathSearch = isXpathSearch(propertyName);
 
         if (!isFuzzy && !isXpathSearch) {
             return ((FilterDelegate<?>) delegate).propertyIsLike(propertyName, pattern, matchCase);
@@ -600,6 +572,11 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
         } else {
             throw new UnsupportedOperationException("Unsupported operands for PropertyIsLike.");
         }
+    }
+
+    public boolean isXpathSearch(String propertyName) {
+        return  (propertyName.indexOf('/') != -1
+                || propertyName.indexOf('@') != -1);
     }
 
     private String normalizePattern(String pattern, String wildcard, String singleChar,
@@ -635,8 +612,11 @@ public class GeotoolsFilterAdapterImpl implements FilterAdapter, FilterVisitor, 
     }
 
     public Object visit(PropertyIsNull filter, Object delegate) {
-        if (filter.getExpression() instanceof PropertyName) {
-            String propertyName = (String) filter.getExpression().accept(this, delegate);
+        String propertyName = (String) filter.getExpression().accept(this, delegate);
+        if(isXpathSearch(propertyName)) {
+            return ((FilterDelegate<?>) delegate).xpathIsNull(propertyName);
+        }
+        else if (filter.getExpression() instanceof PropertyName) {
             return ((FilterDelegate<?>) delegate).propertyIsNull(propertyName);
         } else {
             throw new UnsupportedOperationException(

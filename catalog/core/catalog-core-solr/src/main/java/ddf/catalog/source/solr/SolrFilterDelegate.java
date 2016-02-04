@@ -13,18 +13,20 @@
  */
 package ddf.catalog.source.solr;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeSet;
-
+import com.spatial4j.core.distance.DistanceUtils;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPoint;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKTReader;
+import com.vividsolutions.jts.io.WKTWriter;
+import ddf.catalog.data.AttributeType.AttributeFormat;
+import ddf.catalog.data.Metacard;
+import ddf.catalog.data.Result;
+import ddf.catalog.filter.FilterDelegate;
+import ddf.measure.Distance;
+import ddf.measure.Distance.LinearUnit;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -34,21 +36,11 @@ import org.opengis.filter.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.spatial4j.core.distance.DistanceUtils;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.io.WKTWriter;
-
-import ddf.catalog.data.AttributeType.AttributeFormat;
-import ddf.catalog.data.Metacard;
-import ddf.catalog.data.Result;
-import ddf.catalog.filter.FilterDelegate;
-import ddf.measure.Distance;
-import ddf.measure.Distance.LinearUnit;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Translates filter-proxy calls into Solr query syntax.
@@ -622,6 +614,10 @@ public class SolrFilterDelegate extends FilterDelegate<SolrQuery> {
     @Override
     public SolrQuery xpathIsLike(String xpath, String pattern, boolean isCaseSensitive) {
         return getXPathQuery(xpath, pattern, isCaseSensitive);
+    }
+    @Override
+    public SolrQuery xpathIsEqualTo(String xpath, String literal, boolean isCaseSensitive) {
+        return getXPathQuery(xpath, literal, isCaseSensitive);
     }
 
     @Override
