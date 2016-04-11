@@ -465,6 +465,12 @@ public abstract class AbstractIntegrationTest {
                 editConfigurationFilePut("etc/org.apache.karaf.management.cfg",
                         "rmiServerPort",
                         RMI_SERVER_PORT.getPort()),
+                editConfigurationFilePut("etc/org.ops4j.pax.logging.cfg",
+                        "log4j.logger.ddf",
+                        "TRACE"),
+                editConfigurationFilePut("etc/org.ops4j.pax.logging.cfg",
+                        "log4j.logger.org.codice",
+                        "TRACE"),
                 installStartupFile(getClass().getResourceAsStream("/hazelcast.xml"),
                         "/etc/hazelcast.xml"),
                 installStartupFile(getClass().getResourceAsStream(
