@@ -38,6 +38,7 @@ import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.FeaturesService;
 import org.apache.karaf.features.FeaturesService.Option;
 import org.apache.karaf.features.Repository;
+import org.apache.shiro.util.ThreadContext;
 import org.codice.ddf.admin.application.rest.model.FeatureDetails;
 import org.codice.ddf.admin.application.service.Application;
 import org.codice.ddf.admin.application.service.ApplicationNode;
@@ -57,6 +58,11 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
+
+import ddf.security.permission.KeyValueCollectionPermission;
+import ddf.security.permission.KeyValuePermission;
 
 /**
  * Implementation of the ApplicationService. Uses the karaf features service and
@@ -868,7 +874,12 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
         List<FeatureDetails> features = new ArrayList<FeatureDetails>();
         try {
             for (Feature feature : featuresService.listFeatures()) {
-                features.add(getFeatureView(feature));
+                KeyValueCollectionPermission featureToCheck = new KeyValueCollectionPermission("view-feature.name",
+                        new KeyValuePermission("feature.name", Sets.newHashSet(feature.getName())));
+                if (ThreadContext.getSubject()
+                        .isPermitted(featureToCheck)) {
+                    features.add(getFeatureView(feature));
+                }
             }
         } catch (Exception ex) {
             LOGGER.warn("Could not obtain all features.", ex);

@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.shiro.util.ThreadContext;
 import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -45,6 +46,11 @@ import org.osgi.service.metatype.ObjectClassDefinition;
 import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
+
+import com.google.common.collect.Sets;
+
+import ddf.security.permission.KeyValueCollectionPermission;
+import ddf.security.permission.KeyValuePermission;
 
 public class ConfigurationAdminExt {
 
@@ -265,7 +271,14 @@ public class ConfigurationAdminExt {
             logger.error("Provided LDAP filter is incorrect: " + serviceFilter, e);
         }
 
-        return serviceList;
+        List<Map<String, Object>> authorizedServices = new ArrayList<>();
+        for(Map<String, Object> service : serviceList) {
+            if(isPermittedToViewService((String)service.get("id"))) {
+                authorizedServices.add(service);
+            }
+        }
+
+        return authorizedServices;
     }
 
     private void addConfigurationData(Map<String, Object> service, Configuration[] configs) {
@@ -670,6 +683,12 @@ public class ConfigurationAdminExt {
         return metatypeList;
     }
 
+    public boolean isPermittedToViewService(String servicePid){
+        KeyValueCollectionPermission serviceToCheck = new KeyValueCollectionPermission("view-service.pid",
+                new KeyValuePermission("service.pid", Sets.newHashSet(servicePid)));
+        return ThreadContext.getSubject()
+                .isPermitted(serviceToCheck);
+    }
     /**
      * The <code>IdGetter</code> interface is an internal helper to abstract retrieving object class
      * definitions from all bundles for either pids or factory pids.
