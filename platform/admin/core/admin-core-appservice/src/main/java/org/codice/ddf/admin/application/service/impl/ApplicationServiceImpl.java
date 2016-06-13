@@ -38,6 +38,8 @@ import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.FeaturesService;
 import org.apache.karaf.features.FeaturesService.Option;
 import org.apache.karaf.features.Repository;
+import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ThreadContext;
 import org.codice.ddf.admin.application.rest.model.FeatureDetails;
 import org.codice.ddf.admin.application.service.Application;
 import org.codice.ddf.admin.application.service.ApplicationNode;
@@ -57,6 +59,11 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
+
+import ddf.security.permission.KeyValueCollectionPermission;
+import ddf.security.permission.KeyValuePermission;
 
 /**
  * Implementation of the ApplicationService. Uses the karaf features service and
@@ -137,7 +144,7 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
             Application newApp = new ApplicationImpl(repos[i]);
             try {
                 if (!ignoredApplicationNames.contains(newApp.getName()) && newApp.getFeatures()
-                        .size() > 0) {
+                        .size() > 0 && isPermittedToViewFeature(newApp.getName())) {
                     applications.add(newApp);
                 }
             } catch (ApplicationServiceException ase) {
@@ -796,7 +803,7 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
     @Override
     public void removeApplication(Application application) throws ApplicationServiceException {
         try {
-            if (application != null) {
+            if (application != null && isPermittedToViewFeature(application.getName())) {
                 uninstallAllFeatures(application);
                 featuresService.removeRepository(application.getURI(), false);
             }
@@ -844,7 +851,7 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
         try {
             Set<Feature> features = application.getFeatures();
             for (Feature feature : features) {
-                if (featuresService.isInstalled(feature)) {
+                if (featuresService.isInstalled(feature) && isPermittedToViewFeature(feature.getName())) {
                     try {
                         featuresService.uninstallFeature(feature.getName(),
                                 feature.getVersion(),
@@ -868,7 +875,9 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
         List<FeatureDetails> features = new ArrayList<FeatureDetails>();
         try {
             for (Feature feature : featuresService.listFeatures()) {
-                features.add(getFeatureView(feature));
+                if (isPermittedToViewFeature(feature.getName())) {
+                    features.add(getFeatureView(feature));
+                }
             }
         } catch (Exception ex) {
             LOGGER.warn("Could not obtain all features.", ex);
@@ -900,6 +909,7 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
     public List<FeatureDetails> findApplicationFeatures(String applicationName) {
         List<FeatureDetails> features = getRepositoryFeatures(applicationName).stream()
                 .filter(feature -> !isAppInFeatureList(feature, applicationName))
+                .filter(feature -> isPermittedToViewFeature(feature.getName()))
                 .map(this::getFeatureView)
                 .collect(Collectors.toList());
         return features;
@@ -955,6 +965,14 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
                 context.removeServiceListener(this);
             }
         }
+    }
+
+    public static boolean isPermittedToViewFeature(String featureName){
+        KeyValueCollectionPermission serviceToCheck = new KeyValueCollectionPermission("view-feature.name",
+                new KeyValuePermission("feature.name", Sets.newHashSet(featureName)));
+        Subject subject = ThreadContext.getSubject();
+
+        return subject != null && subject.isPermitted(serviceToCheck);
     }
 
     /**
