@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
 import org.osgi.framework.Bundle;
@@ -164,7 +165,7 @@ public class ConfigurationAdminExt {
                 // configuration
                 String filter = '(' + Constants.SERVICE_PID + '=' + pid + ')';
                 Configuration[] configs = this.configurationAdmin.listConfigurations(filter);
-                if (configs != null && configs.length > 0) {
+                if (configs != null && configs.length > 0 && isPermittedToViewService(pid)) {
                     return configs[0];
                 }
             } catch (InvalidSyntaxException ise) {
@@ -272,8 +273,8 @@ public class ConfigurationAdminExt {
         }
 
         List<Map<String, Object>> authorizedServices = new ArrayList<>();
-        for(Map<String, Object> service : serviceList) {
-            if(isPermittedToViewService((String)service.get("id"))) {
+        for (Map<String, Object> service : serviceList) {
+            if (isPermittedToViewService((String) service.get("id"))) {
                 authorizedServices.add(service);
             }
         }
@@ -617,7 +618,12 @@ public class ConfigurationAdminExt {
             }
         }
 
-        return serviceList;
+        List<Map<String, Object>> authorizedServices = new ArrayList<>();
+        serviceList.stream()
+                .filter(service -> isPermittedToViewService((String) service.get("id")))
+                .forEach(service -> authorizedServices.add(service));
+
+        return authorizedServices;
     }
 
     public List<Map<String, Object>> addMetaTypeNamesToMap(final Map ocdCollection,
@@ -683,12 +689,15 @@ public class ConfigurationAdminExt {
         return metatypeList;
     }
 
-    public boolean isPermittedToViewService(String servicePid){
-        KeyValueCollectionPermission serviceToCheck = new KeyValueCollectionPermission("view-service.pid",
+    public static boolean isPermittedToViewService(String servicePid) {
+        KeyValueCollectionPermission serviceToCheck = new KeyValueCollectionPermission(
+                "view-service.pid",
                 new KeyValuePermission("service.pid", Sets.newHashSet(servicePid)));
-        return ThreadContext.getSubject()
-                .isPermitted(serviceToCheck);
+        Subject subject = ThreadContext.getSubject();
+
+        return subject != null && subject.isPermitted(serviceToCheck);
     }
+
     /**
      * The <code>IdGetter</code> interface is an internal helper to abstract retrieving object class
      * definitions from all bundles for either pids or factory pids.

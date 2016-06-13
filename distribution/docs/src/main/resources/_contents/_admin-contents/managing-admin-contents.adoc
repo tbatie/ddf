@@ -261,6 +261,16 @@ If you have integrated ${branding} with your existing security infrastructure, t
 
 .. The whitelist allows child contexts to be excluded from the authentication constraints of their parents.
 
+
+//TODO Finish writting docs. Explain multiple features as well.
+==== Restricting ${branding} Feature, App, Service and Configuration Access
+
+. See the documentation for your specific security infrastructure to configure users, roles, and groups.
+
+. Select the Admin Configuration Policy under the DDF Admin App
+
+..
+
 ==== LDAP Admin Role Configuration
 
 The admin role will default to `system-admin`. This can be configured to work with an external LDAP with a few minor changes.

@@ -93,6 +93,10 @@ public abstract class AbstractIntegrationTest {
 
     protected static final String CSW_SOURCE_ID = "cswSource";
 
+    protected static final String SYSTEM_ADMIN_USER = "system-admin-user";
+
+    protected static final String SYSTEM_ADMIN_USER_PASSWORD = "password";
+
     protected static ServerSocket placeHolderSocket;
 
     protected static Integer basePort;
@@ -426,7 +430,7 @@ public abstract class AbstractIntegrationTest {
                         HTTPS_PORT.getPort()),
                 editConfigurationFilePut("etc/system.properties", "hostContext", "/solr"),
                 editConfigurationFilePut("etc/system.properties", "ddf.home", "${karaf.home}"),
-
+                editConfigurationFilePut("etc/users.properties", SYSTEM_ADMIN_USER, SYSTEM_ADMIN_USER_PASSWORD + ",system-admin"),
                 editConfigurationFilePut("etc/system.properties",
                         HTTP_PORT.getSystemProperty(),
                         HTTP_PORT.getPort()),

@@ -36,7 +36,6 @@ import javax.management.ObjectName;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.StringUtils;
-import org.apache.shiro.util.ThreadContext;
 import org.codice.ddf.ui.admin.api.module.AdminModule;
 import org.codice.ddf.ui.admin.api.module.ValidationDecorator;
 import org.codice.ddf.ui.admin.api.plugin.ConfigurationAdminPlugin;
@@ -49,10 +48,6 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.ext.XLogger;
 
 import com.github.drapostolos.typeparser.TypeParser;
-import com.google.common.collect.Sets;
-
-import ddf.security.permission.KeyValueCollectionPermission;
-import ddf.security.permission.KeyValuePermission;
 
 /**
  * This class provides convenience methods for interacting with
@@ -233,7 +228,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
             throw new IOException("Argument factoryPid cannot be null or empty");
         }
 
-        if (isPermittedToViewService(factoryPid)) {
+        if (configurationAdminExt.isPermittedToViewService(factoryPid)) {
             Configuration config = configurationAdmin.createFactoryConfiguration(factoryPid);
             config.setBundleLocation(location);
             return config.getPid();
@@ -257,7 +252,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
             throw new IOException("Argument pid cannot be null or empty");
         }
 
-        if (isPermittedToViewService(pid)) {
+        if (configurationAdminExt.isPermittedToViewService(pid)) {
             Configuration config = configurationAdmin.getConfiguration(pid, location);
             config.delete();
         }
@@ -313,7 +308,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
         }
         if (configurations != null) {
             for (Configuration config : configurations) {
-                if (isPermittedToViewService(config.getPid())) {
+                if (configurationAdminExt.isPermittedToViewService(config.getPid())) {
                     result.add(new String[] {config.getPid(), config.getBundleLocation()});
                 }
             }
@@ -357,7 +352,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
         Map<String, Object> propertiesTable = new HashMap<>();
         Configuration config = configurationAdmin.getConfiguration(pid, location);
 
-        if (isPermittedToViewService(config.getPid())) {
+        if (configurationAdminExt.isPermittedToViewService(config.getPid())) {
             Dictionary<String, Object> properties = config.getProperties();
             if (properties != null) {
                 Enumeration<String> keys = properties.keys();
@@ -404,7 +399,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
 
         Configuration config = configurationAdmin.getConfiguration(pid, location);
 
-        if (isPermittedToViewService(config.getPid())) {
+        if (configurationAdminExt.isPermittedToViewService(config.getPid())) {
             final List<Map<String, Object>> metatype = findMetatypeForConfig(config);
             List<Map.Entry<String, Object>> configEntries = new ArrayList<>();
 
@@ -466,7 +461,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
     }
 
     public Map<String, Object> disableConfiguration(String servicePid) throws IOException {
-        if (!isPermittedToViewService(servicePid)) {
+        if (!configurationAdminExt.isPermittedToViewService(servicePid)) {
             return null;
         }
 
@@ -527,7 +522,7 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
                             + servicePid);
         }
 
-        if (!isPermittedToViewService(servicePid)) {
+        if (!configurationAdminExt.isPermittedToViewService(servicePid)) {
             return null;
         }
 
@@ -740,13 +735,5 @@ public class ConfigurationAdmin implements ConfigurationAdminMBean {
 
     public void setGuestClaimsHandlerExt(GuestClaimsHandlerExt guestClaimsHandlerExt) {
         this.guestClaimsHandlerExt = guestClaimsHandlerExt;
-    }
-
-    public boolean isPermittedToViewService(String servicePid) {
-        KeyValueCollectionPermission serviceToCheck = new KeyValueCollectionPermission(
-                "view-service.pid",
-                new KeyValuePermission("service.pid", Sets.newHashSet(servicePid)));
-        return ThreadContext.getSubject()
-                .isPermitted(serviceToCheck);
     }
 }

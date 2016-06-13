@@ -19,14 +19,10 @@
                 persistent-id="org.codice.ddf.admin.config.policy.AdminConfigPolicy"
                 update-strategy="container-managed"/>
         <property name="featurePolicies">
-            <list>
-                <value>banana="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role=admin","http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role=system-admin"</value>
-            </list>
+            <list/>
         </property>
         <property name="servicePolicies">
-            <list>
-                <value>org.codice.ddf.catalog.security.CatalogPolicy=["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role=admin","http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role=system-admin"]</value>
-            </list>
+            <list/>
         </property>
     </bean>
 

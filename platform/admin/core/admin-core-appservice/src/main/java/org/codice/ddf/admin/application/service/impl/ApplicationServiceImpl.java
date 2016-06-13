@@ -38,6 +38,7 @@ import org.apache.karaf.features.Feature;
 import org.apache.karaf.features.FeaturesService;
 import org.apache.karaf.features.FeaturesService.Option;
 import org.apache.karaf.features.Repository;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.codice.ddf.admin.application.rest.model.FeatureDetails;
 import org.codice.ddf.admin.application.service.Application;
@@ -143,7 +144,7 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
             Application newApp = new ApplicationImpl(repos[i]);
             try {
                 if (!ignoredApplicationNames.contains(newApp.getName()) && newApp.getFeatures()
-                        .size() > 0) {
+                        .size() > 0 && isPermittedToViewFeature(newApp.getName())) {
                     applications.add(newApp);
                 }
             } catch (ApplicationServiceException ase) {
@@ -804,7 +805,10 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
         try {
             if (application != null) {
                 uninstallAllFeatures(application);
-                featuresService.removeRepository(application.getURI(), false);
+
+                if(isPermittedToViewFeature(application.getName())) {
+                    featuresService.removeRepository(application.getURI(), false);
+                }
             }
         } catch (Exception e) {
             LOGGER.warn("Could not remove application due to error.", e);
@@ -850,7 +854,7 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
         try {
             Set<Feature> features = application.getFeatures();
             for (Feature feature : features) {
-                if (featuresService.isInstalled(feature)) {
+                if (featuresService.isInstalled(feature) && isPermittedToViewFeature(feature.getName())) {
                     try {
                         featuresService.uninstallFeature(feature.getName(),
                                 feature.getVersion(),
@@ -874,10 +878,7 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
         List<FeatureDetails> features = new ArrayList<FeatureDetails>();
         try {
             for (Feature feature : featuresService.listFeatures()) {
-                KeyValueCollectionPermission featureToCheck = new KeyValueCollectionPermission("view-feature.name",
-                        new KeyValuePermission("feature.name", Sets.newHashSet(feature.getName())));
-                if (ThreadContext.getSubject()
-                        .isPermitted(featureToCheck)) {
+                if (isPermittedToViewFeature(feature.getName())) {
                     features.add(getFeatureView(feature));
                 }
             }
@@ -910,7 +911,7 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
     @Override
     public List<FeatureDetails> findApplicationFeatures(String applicationName) {
         List<FeatureDetails> features = getRepositoryFeatures(applicationName).stream()
-                .filter(feature -> !isAppInFeatureList(feature, applicationName))
+                .filter(feature -> !isAppInFeatureList(feature, applicationName)).filter(feature -> isPermittedToViewFeature(feature.getName()))
                 .map(this::getFeatureView)
                 .collect(Collectors.toList());
         return features;
@@ -966,6 +967,14 @@ public class ApplicationServiceImpl implements ApplicationService, ServiceListen
                 context.removeServiceListener(this);
             }
         }
+    }
+
+    public static boolean isPermittedToViewFeature(String featureName){
+        KeyValueCollectionPermission serviceToCheck = new KeyValueCollectionPermission("view-feature.name",
+                new KeyValuePermission("feature.name", Sets.newHashSet(featureName)));
+        Subject subject = ThreadContext.getSubject();
+
+        return subject != null && subject.isPermitted(serviceToCheck);
     }
 
     /**

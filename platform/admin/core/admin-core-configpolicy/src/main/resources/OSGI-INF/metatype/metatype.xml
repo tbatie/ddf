@@ -19,13 +19,17 @@
          name="Admin Configuration Policy"
          id="org.codice.ddf.admin.config.policy.AdminConfigPolicy">
         <AD
-                description="Set features to hide"
-                name="Feature Permissions" id="featurePolicies" required="false"
+                description="When enabled, the desired features or apps will only be modifiable and viewable to users with the set attributes.
+                &#xA;Example of restricting access of any user without an admin role to the catalog-app : catalog-app=&quot;http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role=admin&quot;"
+                name="Feature and App Permissions" id="featurePolicies" required="false"
                 type="String"
                 default="" cardinality="100"/>
+        <!--TODO add an example in here. It will show up in admin without actually configuring it-->
+
         <AD
-                description="Set services to hide"
-                name="Service Permissions" id="servicePolicies" required="false"
+                description="When enabled, the desired service will only be modifiable and viewable to users with the set attributes.
+                &#xA;Example of restricting access of any user without an admin role to the catalog-app : catalog-app=&quot;http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role=admin&quot;"
+                name="Service and Configuration Permissions" id="servicePolicies" required="false"
                 type="String"
                 default="" cardinality="100"/>
     </OCD>

@@ -19,7 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.Permission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 
@@ -30,17 +33,20 @@ import ddf.security.policy.extension.PolicyExtension;
 
 public class AdminConfigPolicy implements PolicyExtension {
 
-    public static String FEATURE_NAME = "feature.name";
+    // TODO: tbatie - 6/6/16 - Add logging
+    public static final String FEATURE_NAME = "feature.name";
 
-    public static String SERVICE_PID = "service.pid";
+    public static final String SERVICE_PID = "service.pid";
 
-    public static String VIEW_FEATURE_ACTION = "view-" + FEATURE_NAME;
+    public static final String VIEW_FEATURE_ACTION = "view-" + FEATURE_NAME;
 
-    public static String VIEW_SERVICE_ACTION = "view-" + SERVICE_PID;
+    public static final String VIEW_SERVICE_ACTION = "view-" + SERVICE_PID;
 
     Map<String, List<KeyValueCollectionPermission>> featurePolicyPermissions = new HashMap<>();
 
     Map<String, List<KeyValueCollectionPermission>> servicePolicyPermissions = new HashMap<>();
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AdminConfigPolicy.class);
 
     @Override
     public KeyValueCollectionPermission isPermittedMatchAll(
@@ -73,32 +79,39 @@ public class AdminConfigPolicy implements PolicyExtension {
                 } else if (matchPermissionName.equals(SERVICE_PID)) {
                     policyPermissions = servicePolicyPermissions;
                 } else {
-                    //Not a listed policy attribute name so it is white listed
+                    //Not a known policy extension key
                     continue;
                 }
 
-                String matchPermissionValue = ((KeyValuePermission) permission).getValues()
-                        .iterator()
-                        .next();
+                boolean isPermitted = true;
 
-                List<KeyValueCollectionPermission> matchOneAttributes = policyPermissions.get(
-                        matchPermissionValue);
+                //Typically only one feature is desired to be permitted at a time but there is support for multiple feature
+                //If there are multiple features in the permission and one is not authorized, the user is not authorized to see any of the features in the group
+                for (String matchPermissionValue : ((KeyValuePermission) permission).getValues()) {
+                    List<KeyValueCollectionPermission> matchOneAttributes = policyPermissions.get(
+                            matchPermissionValue);
 
-                //Not a listed attribute, the feature or service is white listed
-                if (matchOneAttributes == null) {
-                    continue;
-                }
+                    //Not a known restricted attribute, the feature or service is white listed
+                    if (matchOneAttributes == null) {
+                        continue;
+                    }
 
-                boolean permitted = false;
+                    boolean matchedOneAttribute = false;
 
-                //Only need to match one attribute permission to be permitted
-                for (KeyValueCollectionPermission attributePermissions : matchOneAttributes) {
-                    if (subjectAllCollection.implies(attributePermissions)) {
-                        permitted = true;
+                    for (KeyValueCollectionPermission attributePermissions : matchOneAttributes) {
+                        if (subjectAllCollection.implies(attributePermissions)) {
+                            matchedOneAttribute = true;
+                            break;
+                        }
+                    }
+
+                    if (!matchedOneAttribute) {
+                        isPermitted = false;
+                        break;
                     }
                 }
 
-                if (!permitted) {
+                if (!isPermitted) {
                     newMatchCollection.addAll(Collections.singleton(permission));
                 }
 
@@ -118,23 +131,26 @@ public class AdminConfigPolicy implements PolicyExtension {
         servicePolicyPermissions.putAll(parsePermissions(servicePolicies));
     }
 
-    public Map<String, List<KeyValueCollectionPermission>> parsePermissions(
-            List<String> policies) {
+    public Map<String, List<KeyValueCollectionPermission>> parsePermissions(List<String> policies) {
 
-        Map<String, List<KeyValueCollectionPermission>> newPolicyPermissions =
-                new HashMap<>();
+        Map<String, List<KeyValueCollectionPermission>> newPolicyPermissions = new HashMap<>();
 
         for (String policy : policies) {
-            //Ex: featurename = "attributeName=attributeValue","attributeName2 = attributeValue2"
-            String policyTrimmed = policy.replaceAll("\\s+","");
+
+            if (StringUtils.isEmpty(policy)) {
+                continue;
+            }
+
+            //Example input: featureName="attributeName=attributeValue","attributeName2=attributeValue2"
+            String policyTrimmed = policy.replaceAll("\\s+", "");
             String permissionName = policyTrimmed.split("=", 2)[0];
             String policyAttributes = policyTrimmed.split("=", 2)[1];
 
-            List<KeyValueCollectionPermission> permissionAttributeMap =
-                    new ArrayList<>();
+            List<KeyValueCollectionPermission> permissionAttributeMap = new ArrayList<>();
 
             for (String policyAttribute : policyAttributes.split(",")) {
                 policyAttribute = policyAttribute.replace("\"", "");
+                policyAttribute = policyAttribute.replaceAll("\\s+", "");
                 String attributeName = policyAttribute.split("=")[0];
                 String attributeValue = policyAttribute.split("=")[1];
 
@@ -143,15 +159,13 @@ public class AdminConfigPolicy implements PolicyExtension {
                 permissionAttributeMap.add(newPermission);
             }
 
-            // TODO: tbatie - 5/26/16 - Check if entry already exists, log error
-            if(newPolicyPermissions.containsKey(permissionName)) {
-
+            if (newPolicyPermissions.containsKey(permissionName)) {
+                LOGGER.warn("Overriding settings for permission: {}", permissionName);
             }
             newPolicyPermissions.put(permissionName, permissionAttributeMap);
         }
 
         return newPolicyPermissions;
     }
-
 
 }
