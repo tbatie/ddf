@@ -36,6 +36,7 @@ import static ddf.test.itests.AbstractIntegrationTest.DynamicUrl.SECURE_ROOT;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Proxy;
 import java.net.ServerSocket;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
@@ -73,6 +74,8 @@ import ddf.common.test.AdminConfig;
 import ddf.common.test.PaxExamRule;
 import ddf.common.test.PostTestConstruct;
 import ddf.common.test.ServiceManager;
+import ddf.common.test.ServiceManagerImpl;
+import ddf.common.test.ServiceManagerProxy;
 import ddf.test.itests.common.SecurityPolicyConfigurator;
 import ddf.test.itests.common.UrlResourceReaderConfigurator;
 
@@ -92,6 +95,10 @@ public abstract class AbstractIntegrationTest {
     protected static final String OPENSEARCH_SOURCE_ID = "openSearchSource";
 
     protected static final String CSW_SOURCE_ID = "cswSource";
+
+    protected static final String SYSTEM_ADMIN_USER = "system-admin-user";
+
+    protected static final String SYSTEM_ADMIN_USER_PASSWORD = "password";
 
     protected static ServerSocket placeHolderSocket;
 
@@ -255,8 +262,8 @@ public abstract class AbstractIntegrationTest {
     static {
         // Make Pax URL use the maven.repo.local setting if present
         if (System.getProperty("maven.repo.local") != null) {
-            System.setProperty("org.ops4j.pax.url.mvn.localRepository", System.getProperty(
-                    "maven.repo.local"));
+            System.setProperty("org.ops4j.pax.url.mvn.localRepository",
+                    System.getProperty("maven.repo.local"));
         }
     }
 
@@ -297,7 +304,13 @@ public abstract class AbstractIntegrationTest {
     public void initFacades() {
         ddfHome = System.getProperty(DDF_HOME_PROPERTY);
         adminConfig = new AdminConfig(configAdmin);
-        serviceManager = new ServiceManager(metatype, adminConfig);
+
+        //This proxy runs the service manager as the system subject
+        this.serviceManager =
+                (ServiceManager) Proxy.newProxyInstance(AbstractIntegrationTest.class.getClassLoader(),
+                        ServiceManagerImpl.class.getInterfaces(),
+                        new ServiceManagerProxy(new ServiceManagerImpl(metatype, adminConfig)));
+
         catalogBundle = new CatalogBundle(serviceManager, adminConfig);
         securityPolicy = new SecurityPolicyConfigurator(serviceManager, configAdmin);
         urlResourceReaderConfigurator = new UrlResourceReaderConfigurator(configAdmin);
@@ -388,8 +401,9 @@ public abstract class AbstractIntegrationTest {
         return options(logLevel(LogLevelOption.LogLevel.WARN),
                 useOwnExamBundlesStartLevel(100),
                 // increase timeout for CI environment
-                systemTimeout(TimeUnit.MINUTES.toMillis(10)), when(Boolean.getBoolean(
-                        "keepRuntimeFolder")).useOptions(keepRuntimeFolder()), cleanCaches(true));
+                systemTimeout(TimeUnit.MINUTES.toMillis(10)),
+                when(Boolean.getBoolean("keepRuntimeFolder")).useOptions(keepRuntimeFolder()),
+                cleanCaches(true));
     }
 
     protected Option[] configureAdditionalBundles() {
@@ -415,7 +429,8 @@ public abstract class AbstractIntegrationTest {
                         "test-security-common"),
                 mavenBundle("ddf.test.thirdparty", "rest-assured").versionAsInProject(),
                 wrappedBundle(mavenBundle("com.google.guava",
-                        "guava").versionAsInProject()).exports("*;version=18.0"));
+                        "guava").versionAsInProject()).exports("*;version=18.0"),
+                mavenBundle("io.fastjson", "boon").versionAsInProject());
     }
 
     protected Option[] configureConfigurationPorts() throws URISyntaxException, IOException {
@@ -426,7 +441,9 @@ public abstract class AbstractIntegrationTest {
                         HTTPS_PORT.getPort()),
                 editConfigurationFilePut("etc/system.properties", "hostContext", "/solr"),
                 editConfigurationFilePut("etc/system.properties", "ddf.home", "${karaf.home}"),
-
+                editConfigurationFilePut("etc/users.properties",
+                        SYSTEM_ADMIN_USER,
+                        SYSTEM_ADMIN_USER_PASSWORD + ",system-admin"),
                 editConfigurationFilePut("etc/system.properties",
                         HTTP_PORT.getSystemProperty(),
                         HTTP_PORT.getPort()),
@@ -470,28 +487,28 @@ public abstract class AbstractIntegrationTest {
                 installStartupFile(getClass().getResourceAsStream("/hazelcast.xml"),
                         "/etc/hazelcast.xml"),
                 installStartupFile(getClass().getResourceAsStream(
-                                "/ddf.security.sts.client.configuration.config"),
+                        "/ddf.security.sts.client.configuration.config"),
                         "/etc/ddf.security.sts.client.configuration.config"),
                 editConfigurationFilePut("etc/ddf.security.sts.client.configuration.config",
                         "address",
                         "\"" + SECURE_ROOT + HTTPS_PORT.getPort()
                                 + "/services/SecurityTokenService?wsdl" + "\""),
                 installStartupFile(getClass().getResourceAsStream(
-                                "/ddf.catalog.solr.external.SolrHttpCatalogProvider.config"),
+                        "/ddf.catalog.solr.external.SolrHttpCatalogProvider.config"),
                         "/etc/ddf.catalog.solr.external.SolrHttpCatalogProvider.config"));
     }
 
     protected Option[] configureMavenRepos() {
         return options(editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
-                        "org.ops4j.pax.url.mvn.repositories",
-                        "http://repo1.maven.org/maven2@id=central,"
-                                + "http://oss.sonatype.org/content/repositories/snapshots@snapshots@noreleases@id=sonatype-snapshot,"
-                                + "http://oss.sonatype.org/content/repositories/ops4j-snapshots@snapshots@noreleases@id=ops4j-snapshot,"
-                                + "http://repository.apache.org/content/groups/snapshots-group@snapshots@noreleases@id=apache,"
-                                + "http://svn.apache.org/repos/asf/servicemix/m2-repo@id=servicemix,"
-                                + "http://repository.springsource.com/maven/bundles/release@id=springsource,"
-                                + "http://repository.springsource.com/maven/bundles/external@id=springsourceext,"
-                                + "http://oss.sonatype.org/content/repositories/releases/@id=sonatype"),
+                "org.ops4j.pax.url.mvn.repositories",
+                "http://repo1.maven.org/maven2@id=central,"
+                        + "http://oss.sonatype.org/content/repositories/snapshots@snapshots@noreleases@id=sonatype-snapshot,"
+                        + "http://oss.sonatype.org/content/repositories/ops4j-snapshots@snapshots@noreleases@id=ops4j-snapshot,"
+                        + "http://repository.apache.org/content/groups/snapshots-group@snapshots@noreleases@id=apache,"
+                        + "http://svn.apache.org/repos/asf/servicemix/m2-repo@id=servicemix,"
+                        + "http://repository.springsource.com/maven/bundles/release@id=springsource,"
+                        + "http://repository.springsource.com/maven/bundles/external@id=springsourceext,"
+                        + "http://oss.sonatype.org/content/repositories/releases/@id=sonatype"),
                 when(System.getProperty("maven.repo.local") != null).useOptions(
                         editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg",
                                 "org.ops4j.pax.url.mvn.localRepository",
@@ -499,10 +516,11 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected Option[] configureSystemSettings() {
-        return options(when(System.getProperty(AdminConfig.TEST_LOGLEVEL_PROPERTY) != null).useOptions(
+        return options(when(
+                System.getProperty(AdminConfig.TEST_LOGLEVEL_PROPERTY) != null).useOptions(
                 systemProperty(AdminConfig.TEST_LOGLEVEL_PROPERTY).value(System.getProperty(
                         AdminConfig.TEST_LOGLEVEL_PROPERTY,
-                                ""))),
+                        ""))),
                 when(Boolean.getBoolean("isDebugEnabled")).useOptions(vmOption(
                         "-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005")),
                 when(System.getProperty("maven.repo.local") != null).useOptions(systemProperty(
@@ -526,8 +544,8 @@ public abstract class AbstractIntegrationTest {
                 // Need to add catalog-core since there are imports in the itests from catalog-core.
                 editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
                         "featuresBoot",
-                        "catalog-core"), editConfigurationFileExtend(
-                        "etc/org.apache.karaf.features.cfg",
+                        "catalog-core"),
+                editConfigurationFileExtend("etc/org.apache.karaf.features.cfg",
                         "featuresRepositories",
                         featuresUrl));
     }
@@ -559,7 +577,8 @@ public abstract class AbstractIntegrationTest {
         config.update(properties);
     }
 
-    protected void configureShowInvalidMetacards(String showErrors, String showWarnings) throws IOException {
+    protected void configureShowInvalidMetacards(String showErrors, String showWarnings)
+            throws IOException {
         Configuration config = configAdmin.getConfiguration(
                 "ddf.catalog.federation.impl.CachingFederationStrategy",
                 null);
@@ -791,4 +810,6 @@ public abstract class AbstractIntegrationTest {
             this.put("pollInterval", 1);
         }
     }
+
+
 }
