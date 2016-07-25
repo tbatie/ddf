@@ -79,7 +79,7 @@ public class FileSystemPersistenceProvider
      * @return the path to root directory where serialized objects will be persisted
      */
     String getPersistencePath() {
-        return new AbsolutePathResolver("data/").getPath();
+        return AbsolutePathResolver.getPath("data" + File.separator);
     }
 
     /**
@@ -88,7 +88,7 @@ public class FileSystemPersistenceProvider
      * @return
      */
     String getMapStorePath() {
-        return getPersistencePath() + mapName + "/";
+        return getPersistencePath() + mapName + File.separator;
     }
 
     @Override

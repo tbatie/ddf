@@ -24,8 +24,13 @@
     <bean id="pdpAuthzRealm" class="ddf.security.pdp.realm.AuthzRealm">
         <cm:managed-properties persistent-id="ddf.security.pdp.realm.AuthzRealm"
                                update-strategy="container-managed"/>
-        <argument value="${ddf.home}/etc/pdp/policies"/>
+        <argument ref="defaultPdpPoliciesPath"/>
         <argument ref="xmlParser"/>
+    </bean>
+
+    <bean id="defaultPdpPoliciesPath" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/pdp/policies"/>
     </bean>
 
     <reference-list id="userAttributeExpansionList" interface="ddf.security.expansion.Expansion"

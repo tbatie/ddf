@@ -22,12 +22,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.codice.ddf.configuration.AbsolutePathResolver;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
@@ -49,30 +52,43 @@ public class HazelcastNotificationStoreTest {
 
     private static final String PERSISTENT_CACHE_NAME = "persistentNotifications";
 
+    private HazelcastNotificationStore store;
+
+    private HazelcastInstance instance;
+
     @BeforeClass
     public static void beforeTests() {
         System.setProperty("ddf.home", System.getProperty("java.io.tmpdir"));
     }
 
-    @Test
-    public void testCreateCacheWithXmlConfigFile() throws Exception {
-
+    @Before
+    public void setup() {
         // Set system property that Hazelcast uses for its XML Config file
         String xmlConfigFilename = "notifications-hazelcast.xml";
         String xmlConfigLocation =
                 System.getProperty("user.dir") + TEST_PATH + "notifications-hazelcast.xml";
+        xmlConfigLocation = AbsolutePathResolver.getPath(xmlConfigLocation);
         System.setProperty("hazelcast.config", xmlConfigLocation);
 
         Bundle bundle = mock(Bundle.class);
-        URL url = new URL("file:///" + new File(xmlConfigLocation).getAbsolutePath());
+        URL url = null;
+        try {
+            url = new URL("file:///" + new File(xmlConfigLocation).getAbsolutePath());
+        } catch (MalformedURLException e) {
+            fail("URL was not valid");
+        }
         when(bundle.getResource(anyString())).thenReturn(url);
         BundleContext context = mock(BundleContext.class);
         when(context.getBundle()).thenReturn(bundle);
 
         // Create new NotificationStore that will be configured based on the XML config file
-        HazelcastNotificationStore store = new HazelcastNotificationStore(context,
-                xmlConfigFilename);
-        HazelcastInstance instance = store.getHazelcastInstance();
+        store = new HazelcastNotificationStore(context, xmlConfigFilename);
+        instance = store.getHazelcastInstance();
+
+    }
+
+    @Test
+    public void testCreateCacheWithXmlConfigFile() throws Exception {
 
         MapConfig mapConfig = instance.getConfig()
                 .getMapConfig(PERSISTENT_CACHE_NAME);
@@ -99,22 +115,6 @@ public class HazelcastNotificationStoreTest {
     @Test
     public void testCreateCacheWithMapStore() throws Exception {
 
-        // Set system property that Hazelcast uses for its XML Config file
-        String xmlConfigFilename = "notifications-hazelcast.xml";
-        String xmlConfigLocation =
-                System.getProperty("user.dir") + TEST_PATH + "notifications-hazelcast.xml";
-        System.setProperty("hazelcast.config", xmlConfigLocation);
-
-        Bundle bundle = mock(Bundle.class);
-        URL url = new URL("file:///" + new File(xmlConfigLocation).getAbsolutePath());
-        when(bundle.getResource(anyString())).thenReturn(url);
-        BundleContext context = mock(BundleContext.class);
-        when(context.getBundle()).thenReturn(bundle);
-
-        // Create new NotificationStore that will be configured based on the XML config file
-        HazelcastNotificationStore store = new HazelcastNotificationStore(context,
-                xmlConfigFilename);
-        HazelcastInstance instance = store.getHazelcastInstance();
         File persistenceDir = null;
 
         try {
@@ -158,22 +158,6 @@ public class HazelcastNotificationStoreTest {
     @Test
     public void testQueryCacheWithMultipleUsersNotifications() throws Exception {
 
-        // Set system property that Hazelcast uses for its XML Config file
-        String xmlConfigFilename = "notifications-hazelcast.xml";
-        String xmlConfigLocation =
-                System.getProperty("user.dir") + TEST_PATH + "notifications-hazelcast.xml";
-        System.setProperty("hazelcast.config", xmlConfigLocation);
-
-        Bundle bundle = mock(Bundle.class);
-        URL url = new URL("file:///" + new File(xmlConfigLocation).getAbsolutePath());
-        when(bundle.getResource(anyString())).thenReturn(url);
-        BundleContext context = mock(BundleContext.class);
-        when(context.getBundle()).thenReturn(bundle);
-
-        // Create new NotificationStore that will be configured based on the XML config file
-        HazelcastNotificationStore store = new HazelcastNotificationStore(context,
-                xmlConfigFilename);
-        HazelcastInstance instance = store.getHazelcastInstance();
         File persistenceDir = null;
 
         try {
@@ -204,6 +188,8 @@ public class HazelcastNotificationStoreTest {
             File mapStoreDir = new File(mapStorePath);
             assertTrue(mapStoreDir.exists());
             String[] persistedNotifications = mapStoreDir.list();
+            assertNotNull("persistedNotifications came back null - did something get moved?",
+                    persistedNotifications);
             assertTrue(persistedNotifications.length == (userIds.length * numNotificationsPerUser));
 
             // Query for specific user's notifications and verify only they are returned

@@ -26,11 +26,16 @@
                                update-strategy="container-managed"/>
         <property name="securityManager" ref="securityManager"/>
         <property name="signaturePropertiesFile"
-                  value="${ddf.home}/etc/ws-security/server/signature.properties"/>
+                  ref="signaturePropertiesPath"/>
         <property name="sessionFactory">
             <reference interface="ddf.security.http.SessionFactory"
                        filter="(id=http)"/>
         </property>
+    </bean>
+
+    <bean id="signaturePropertiesPath" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/ws-security/server/signature.properties"/>
     </bean>
 
     <service ref="filter"

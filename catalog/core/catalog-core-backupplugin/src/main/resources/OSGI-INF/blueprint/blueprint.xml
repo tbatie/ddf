@@ -25,10 +25,15 @@
     <bean id="catalogBackupPlugin" class="ddf.catalog.backup.CatalogBackupPlugin"
           destroy-method="shutdown">
         <cm:managed-properties persistent-id="plugin.backup" update-strategy="container-managed"/>
-        <property name="rootBackupDir" value="${ddf.home}/data/backup"/>
+        <property name="rootBackupDir" ref="rootBackupDir"/>
         <property name="subDirLevels" value="2"/>
         <property name="terminationTimeoutSeconds" value="30"/>
         <property name="executor" ref="executorService"/>
+    </bean>
+
+    <bean id="rootBackupDir" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/data/backup"/>
     </bean>
 
     <service ref="catalogBackupPlugin" interface="ddf.catalog.plugin.PostIngestPlugin"/>

@@ -54,7 +54,7 @@ public class FileSystemPersistenceProvider
 
     private static final String SER_REGEX = "\\.ser";
 
-    private static final String PERSISTENCE_PATH = new AbsolutePathResolver("data/").getPath();
+    private static final String PERSISTENCE_PATH = AbsolutePathResolver.getPath("data/");
 
     private String mapName = "default";
 

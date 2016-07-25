@@ -23,7 +23,12 @@
           class="org.codice.ddf.security.handler.api.PKIAuthenticationTokenFactory"
           init-method="init">
         <property name="signaturePropertiesPath"
-                  value="${ddf.home}/etc/ws-security/server/signature.properties"/>
+                  ref="defaultSignaturePropertiesPath"/>
+    </bean>
+
+    <bean id="defaultSignaturePropertiesPath" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/ws-security/server/signature.properties"/>
     </bean>
 
     <bean id="handler" class="org.codice.ddf.security.handler.guest.GuestHandler">

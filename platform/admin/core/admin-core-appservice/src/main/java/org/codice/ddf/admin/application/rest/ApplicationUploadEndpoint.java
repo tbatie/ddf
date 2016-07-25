@@ -52,8 +52,8 @@ public class ApplicationUploadEndpoint {
 
     private static final String DEFAULT_FILE_NAME = "file.jar";
 
-    private static String defaultFileLocation =
-            new AbsolutePathResolver("data/installer/uploads/").getPath();
+    private static String defaultFileLocation = AbsolutePathResolver.getPath(
+            "data/installer/uploads/");
 
     private static final String JAR_EXT = "jar";
 
@@ -232,6 +232,6 @@ public class ApplicationUploadEndpoint {
      * @param fileLocation the desired fileLocation
      */
     void setDefaultFileLocation(String fileLocation) {
-        defaultFileLocation = new AbsolutePathResolver(fileLocation).getPath();
+        defaultFileLocation = AbsolutePathResolver.getPath(fileLocation);
     }
 }

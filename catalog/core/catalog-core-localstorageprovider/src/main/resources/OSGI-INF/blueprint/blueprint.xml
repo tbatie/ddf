@@ -22,8 +22,13 @@
         <cm:managed-properties
                 persistent-id="org.codice.ddf.catalog.content.impl.FileSystemStorageProvider"
                 update-strategy="container-managed"/>
-        <property name="baseContentDirectory" value="${ddf.home}/data"/>
+        <property name="baseContentDirectory" ref="baseContentDirectory"/>
         <property name="mimeTypeMapper" ref="mimeTypeMapper"/>
+    </bean>
+
+    <bean id="baseContentDirectory" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/data"/>
     </bean>
 
     <service ref="fileStoreService" interface="ddf.catalog.content.StorageProvider"/>

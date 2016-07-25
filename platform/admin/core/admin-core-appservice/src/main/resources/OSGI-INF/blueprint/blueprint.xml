@@ -24,7 +24,12 @@
                 update-strategy="container-managed"/>
         <argument ref="bundleStateServices"/>
         <property name="configFileName"
-                  value="${ddf.home}/etc/org.codice.ddf.admin.applicationlist.properties"/>
+                  ref="configFilePath"/>
+    </bean>
+
+    <bean id="configFilePath" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/org.codice.ddf.admin.applicationlist.properties"/>
     </bean>
 
     <service ref="appService"

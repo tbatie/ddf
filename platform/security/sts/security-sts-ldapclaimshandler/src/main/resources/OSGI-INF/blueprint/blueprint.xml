@@ -57,11 +57,16 @@
             <property name="objectClass" value="groupOfNames"/>
             <property name="memberNameAttribute" value="member"/>
             <property name="groupBaseDn" value="ou=groups,dc=example,dc=com"/>
-            <property name="propertyFileLocation" value="${ddf.home}/etc/ws-security/attributeMap.properties"/>
+            <property name="propertyFileLocation" ref="defaultPropertyFileLocation"/>
             <cm:managed-properties persistent-id=""
                                    update-strategy="component-managed" update-method="update"/>
         </cm:managed-component>
     </cm:managed-service-factory>
+
+    <bean id="defaultPropertyFileLocation" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/ws-security/attributeMap.properties"/>
+    </bean>
 
 </blueprint>
 

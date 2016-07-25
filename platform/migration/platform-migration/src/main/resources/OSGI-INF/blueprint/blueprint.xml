@@ -19,11 +19,26 @@
     <ext:property-placeholder>
         <ext:default-properties>
             <ext:property name="configFileExtension" value=".config"/>
-            <ext:property name="configFileDirectory" value="${ddf.home}/etc"/>
-            <ext:property name="processedDirectory" value="${ddf.home}/etc/processed"/>
-            <ext:property name="failedDirectory" value="${ddf.home}/etc/failed"/>
+            <ext:property name="configFileDirectory" ref="defaultConfigFileDir"/>
+            <ext:property name="processedDirectory" ref="defaultProcessedDirectory"/>
+            <ext:property name="failedDirectory" ref="defaultFailedDirectory"/>
         </ext:default-properties>
     </ext:property-placeholder>
+
+    <bean id="defaultConfigFileDir" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc"/>
+    </bean>
+
+    <bean id="defaultProcessedDirectory" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/processed"/>
+    </bean>
+
+    <bean id="defaultFailedDirectory" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/failed"/>
+    </bean>
 
     <reference id="configurationAdmin" interface="org.osgi.service.cm.ConfigurationAdmin"/>
 
@@ -51,19 +66,19 @@
     <!-- Config Directory Path ${ddf.home}/etc/ -->
     <bean id="configDirectoryPath" class="java.nio.file.Path" factory-ref="ddfHome"
           factory-method="resolve">
-        <argument value="etc"/>
+        <argument ref="defaultConfigFileDir"/>
     </bean>
 
     <!-- Processed Directory Path ${ddf.home}/etc/processed -->
     <bean id="processedDirectoryPath" class="java.nio.file.Path" factory-ref="ddfHome"
           factory-method="resolve">
-        <argument value="${ddf.home}/etc/processed"/>
+        <argument ref="defaultProcessedDirectory"/>
     </bean>
 
     <!-- Failed Directory Path ${ddf.home}/etc/failed -->
     <bean id="failedDirectoryPath" class="java.nio.file.Path" factory-ref="ddfHome"
           factory-method="resolve">
-        <argument value="${ddf.home}/etc/failed"/>
+        <argument ref="defaultFailedDirectory"/>
     </bean>
 
     <bean id="configurationFileFactory"

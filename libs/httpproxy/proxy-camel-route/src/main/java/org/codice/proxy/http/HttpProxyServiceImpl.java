@@ -45,8 +45,7 @@ public class HttpProxyServiceImpl implements HttpProxyService {
 
     public static final String GENERIC_ENDPOINT_NAME = "endpoint";
 
-    public static final String TRUSTSTORE_VALUE_DEFAULT = new AbsolutePathResolver(
-            "etc/keystores/serverTruststore.jks").getPath();
+    public static final String TRUSTSTORE_VALUE_DEFAULT = AbsolutePathResolver.getPath("etc/keystores/serverTruststore.jks");
 
     public static final String TRUSTSTORE_PASSWORD_VALUE = "changeit";
 

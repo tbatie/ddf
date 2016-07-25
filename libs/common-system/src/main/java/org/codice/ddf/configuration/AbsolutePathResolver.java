@@ -24,13 +24,7 @@ public class AbsolutePathResolver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbsolutePathResolver.class);
 
-    private final String path;
-
-    public AbsolutePathResolver(String path) {
-        this.path = path;
-    }
-
-    public String getPath() {
+    public static String getPath(String path) {
 
         if (path == null) {
             return null;

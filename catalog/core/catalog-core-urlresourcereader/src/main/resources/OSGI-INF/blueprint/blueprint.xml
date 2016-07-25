@@ -16,7 +16,7 @@
 <blueprint xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
            xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
            xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.2.0">
-           
+
   <ext:property-placeholder/>
 
   <bean id="urlReader" class="ddf.catalog.resource.impl.URLResourceReader">
@@ -26,11 +26,16 @@
       <argument ref="mimeTypeMapper"/>
       <property name="rootResourceDirectories">
         <set>
-          <value type="java.lang.String">${ddf.home}/data/products</value>
+            <ref component-id="defaultRootResourceDir"/>
         </set>
       </property>
   </bean>
-  
+
+    <bean id="defaultRootResourceDir" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/data/products"/>
+    </bean>
+
   <reference id="mimeTypeMapper" interface="ddf.mime.MimeTypeMapper"/>
 
   <service ref="urlReader" interface="ddf.catalog.resource.ResourceReader">
@@ -39,5 +44,5 @@
       <entry key="id" value="URLResourceReader"/>
     </service-properties>
   </service>
-  
+
 </blueprint>

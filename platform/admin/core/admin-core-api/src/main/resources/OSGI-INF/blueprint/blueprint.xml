@@ -22,9 +22,19 @@
 
     <bean id="guestClaimsHandlerExt" class="org.codice.ddf.ui.admin.api.GuestClaimsHandlerExt"
           init-method="init">
-        <property name="availableClaimsFile" value="${ddf.home}/etc/ws-security/attributeMap.properties"/>
-        <property name="profileDir" value="${ddf.home}/etc/ws-security/profiles/"/>
+        <property name="availableClaimsFile" ref="availableClaimsFilePath"/>
+        <property name="profileDir" ref="profileDir"/>
         <property name="immutableClaims" value="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier,http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role"/>
+    </bean>
+
+    <bean id="availableClaimsFilePath" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/ws-security/attributeMap.properties"/>
+    </bean>
+
+    <bean id="profileDir" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/etc/ws-security/profiles/"/>
     </bean>
 
     <bean id="configAdminMbean" class="org.codice.ddf.ui.admin.api.ConfigurationAdmin"

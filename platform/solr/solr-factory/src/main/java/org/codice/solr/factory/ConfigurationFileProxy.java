@@ -40,11 +40,9 @@ public class ConfigurationFileProxy {
 
     public static final String DEFAULT_SOLR_CONFIG_PARENT_DIR = "etc";
 
-    public static final String SOLR_CONFIG_LOCATION_IN_BUNDLE =
-            new AbsolutePathResolver("solr/conf").getPath();
+    public static final String SOLR_CONFIG_LOCATION_IN_BUNDLE = AbsolutePathResolver.getPath("solr/conf");
 
-    public static final String DEFAULT_SOLR_DATA_PARENT_DIR =
-            new AbsolutePathResolver("data/solr").getPath();
+    public static final String DEFAULT_SOLR_DATA_PARENT_DIR = AbsolutePathResolver.getPath("data/solr");
 
     public static final String CATALOG_SOLR_COLLECTION_NAME = "metacard";
 

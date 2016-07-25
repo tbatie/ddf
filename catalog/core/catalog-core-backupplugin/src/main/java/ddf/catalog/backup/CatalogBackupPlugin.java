@@ -285,7 +285,7 @@ public class CatalogBackupPlugin implements PostIngestPlugin {
      */
     public void setRootBackupDir(String dir) {
 
-        rootBackupDir = new AbsolutePathResolver(dir).getPath();
+        rootBackupDir = AbsolutePathResolver.getPath(dir);
         rootDirOjbect = null;
     }
 

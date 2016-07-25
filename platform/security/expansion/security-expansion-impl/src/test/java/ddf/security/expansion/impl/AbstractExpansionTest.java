@@ -234,7 +234,7 @@ public class AbstractExpansionTest {
             String filename = testConfigFile.getFile();
             exp.loadConfiguration(filename);
 
-            map = exp.getExpansionMap();
+        map = exp.getExpansionMap();
             assertMapsAreEqual(map, testmap);
 
             // make sure exisitng rules get cleared on reload

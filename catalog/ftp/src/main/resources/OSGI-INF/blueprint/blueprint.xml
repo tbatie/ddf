@@ -44,9 +44,14 @@
         <argument ref="mimeTypeMapper"/>
     </bean>
     <bean id="userManager" class="ddf.catalog.ftp.UserManagerImpl">
-        <property name="uploadDirectory" value="${ddf.home}/data/products"/>
+        <property name="uploadDirectory" ref="uploadDefaultDirectory"/>
         <property name="karafLocalRoles" value="${karaf.local.roles}"/>
         <argument ref="securityManager"/>
+    </bean>
+
+    <bean id="uploadDefaultDirectory" class="org.codice.ddf.configuration.AbsolutePathResolver"
+          factory-method="getPath">
+        <argument value="/data/products"/>
     </bean>
 
     <bean id="sslConfigurationFactory" class="org.apache.ftpserver.ssl.SslConfigurationFactory"/>
