@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.xml.bind.JAXBElement;
 
@@ -62,6 +63,7 @@ public class RegistryTransformerTest {
 
     @Before
     public void setUp() {
+        Locale.setDefault(Locale.US);
         rit = new RegistryTransformer();
         parser = new XmlParser();
         rit.setParser(parser);

@@ -23,6 +23,7 @@ import static org.junit.Assert.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.bind.JAXBElement;
@@ -34,6 +35,7 @@ import org.codice.ddf.parser.xml.XmlParser;
 import org.codice.ddf.registry.federationadmin.service.FederationAdminException;
 import org.codice.ddf.registry.schemabindings.EbrimConstants;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import oasis.names.tc.ebxml_regrep.xsd.rim._3.RegistryObjectType;
@@ -45,6 +47,11 @@ public class RegistryReportMapBuilderTest {
     private ParserConfigurator configurator;
 
     private RegistryReportMapBuilder reportHelper;
+
+    @BeforeClass
+    public void setupOnce(){
+        Locale.setDefault(Locale.US);
+    }
 
     @Before
     public void setup() {

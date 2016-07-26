@@ -43,7 +43,7 @@ public class InternationalStringTypeHelperTest {
 
     @Before
     public void setUp() {
-        istHelper.setLocale(Locale.getDefault());
+        istHelper.setLocale(Locale.US);
     }
 
     @Test
