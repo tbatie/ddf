@@ -28,8 +28,9 @@ define([
     'js/controllers/Modal.controller',
     'js/controllers/SystemUsage.controller',
     'text!templates/moduleTab.handlebars',
-    'properties'
-    ],function (_, Backbone, Marionette, ich, $, poller, wreqr, Module, tabs, appHeader, header, footer, ModalController, SystemUsageController, moduleTab, Properties) {
+    'properties',
+    'js/util/SessionRefresherUtil'
+    ],function (_, Backbone, Marionette, ich, $, poller, wreqr, Module, AppModel, tabs, appHeader, header, footer, ModalController, SystemUsageController, moduleTab, Properties, SessionRefresherUtil) {
     'use strict';
 
     var Application = {};
@@ -108,6 +109,18 @@ define([
     // show System Notification Banner
     Application.App.addInitializer(function () {
         new SystemUsageController();
+    });
+
+    //refresh the session if keypress events occur
+    SessionRefresherUtil.start(60000);
+
+    //redirect upon session timeout
+    $( document ).ajaxError(function(event, jqxhr) {
+        //jslint made me do this
+        event=null;
+        if(jqxhr.status === 401){
+            window.location='/login/index.html?prevurl=' + encodeURI(window.location.pathname);
+        }
     });
 
     //configure the router (we aren't using this yet)

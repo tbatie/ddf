@@ -128,11 +128,7 @@ define([
                     }
                 }
             }
-
-
         });
-
         return FeatureController;
-
     }
 );
