@@ -104,8 +104,12 @@
 
         <!-- HTML & PDF Documentation -->
         <fileSet>
-            <directory>${setup.folder}/docs</directory>
-            <outputDirectory>/documentation</outputDirectory>
+            <directory>${setup.folder}/docs/**/html</directory>
+            <outputDirectory>/documentation/html</outputDirectory>
+        </fileSet>
+        <fileSet>
+            <directory>${setup.folder}/docs/**/pdf</directory>
+            <outputDirectory>/documentation/pdf</outputDirectory>
         </fileSet>
 
         <!-- Javadoc -->

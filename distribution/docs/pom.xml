@@ -415,6 +415,29 @@
                                 <skip>true</skip>
                             </configuration>
                         </plugin>
+                        <plugin>
+                            <groupId>org.apache.felix</groupId>
+                            <artifactId>maven-bundle-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <phase>package</phase>
+                                    <goals>
+                                        <goal>bundle</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                            <configuration>
+                                <instructions>
+                                    <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                                    <Web-ContextPath>/admin/docs</Web-ContextPath>
+                                    <_wab>src/main/webapp/</_wab>
+                                    <Include-Resource>
+                                        ${project.build.directory}/docs/html,
+                                        {maven-resources}
+                                    </Include-Resource>
+                                </instructions>
+                            </configuration>
+                        </plugin>
                     </plugins>
                 </build>
             </profile>
@@ -423,6 +446,11 @@
         <dependency>
             <groupId>ddf.ui.search</groupId>
             <artifactId>standard</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ddf.admin.core</groupId>
+            <artifactId>admin-core-api</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

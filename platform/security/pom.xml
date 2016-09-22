@@ -241,5 +241,6 @@
         <module>rest</module>
         <module>security-migratable</module>
         <module>security-services-app</module>
+        <module>security-ui</module>
     </modules>
 </project>
