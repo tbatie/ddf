@@ -53,9 +53,12 @@ public class LdapWizard implements SparkApplication {
     @Override
     public void init() {
 
-        for (Map.Entry<String, Stage> stage : stages.entrySet()) {
-            get(stage.getKey(), (req, res) -> getStage());
-        }
+//        for (Map.Entry<String, Stage> stage : stages.entrySet()) {
+//            get(stage.getKey(), (req, res) -> stage.getValue(), Boon::toJson);
+//            post(stage.getKey(), (req, res) -> stage.getValue().procces(req), Boon::toJson);
+//        }
+
+
         get("/network", (req, res) -> getLdapNetworkSettingsStage(getStateFromRequest(req)), Boon::toJson);
         post("/network", (req, res) -> validateLdapNetworkSettings(req), Boon::toJson);
 
@@ -345,6 +348,140 @@ public class LdapWizard implements SparkApplication {
         POST, GET
     }
 
+    public static class Action {
+        public ActionMethod method;
+
+        public String url;
+
+        public String label;
+
+        public Action(ActionMethod method, String url, String label) {
+            this.method = method;
+            this.url = url;
+            this.label = label;
+        }
+    }
+
+    public static class BindHostSettingsStage extends Stage {
+
+        @Override
+        public Stage validateFields(Stage stageToCheck, Map<String, String> params) {
+            return null;
+        }
+
+        @Override
+        public Stage testFields(Stage stageToTest, Map<String, String> params) {
+            return null;
+        }
+
+        @Override
+        public Stage setNewState(Stage currentStage, Map<String, String> params) {
+            return null;
+        }
+
+        @Override
+        public Stage getNextStage(Stage prevStage, Map<String, String> params) {
+            return null;
+        }
+    }
+
+    public static class LdapNetworkSettingsStage extends Stage {
+        
+        private Form defaultForm = Form.builder("LDAP Network Settings")
+                .add(Question.builder(LDAP_HOST_NAME_ID, HOSTNAME).label("LDAP Host name"))
+                .add(Question.builder(LDAP_PORT_ID, PORT).defaults(389, 636).label("LDAP Port"))
+                .add(Question.builder(LDAP_ENCRYPTION_METHOD, STRING_ENUM).defaults(LDAP_ENCRYPTION_METHODS).label("Encryption method"));
+
+        private Action defaultAction = new Action(POST,
+                "/security/wizard/network",
+                "check");
+
+        public LdapNetworkSettingsStage() {
+            setStage(defaultForm, new HashMap<>(), defaultAction);
+        }
+
+        public LdapNetworkSettingsStage(Map<String, Object> state) {
+            setStage(defaultForm, state, defaultAction);
+        }
+
+        @Override
+        public Stage validateFields(Stage ldapNetworkSettingsStage, Map<String, String> params) {
+            Form ldapNetworkSettingsForm = ldapNetworkSettingsStage.getForm();
+            Question ldapHostNameQ = ldapNetworkSettingsForm.getQuestion(LDAP_HOST_NAME_ID);
+            Question ldapPortQ = ldapNetworkSettingsForm.getQuestion(LDAP_PORT_ID);
+            Question ldapEncryptionMethodQ =
+                    ldapNetworkSettingsForm.getQuestion(LDAP_ENCRYPTION_METHOD);
+
+            String ldapHostName = null;
+            String ldapPort = null;
+            String ldapEncryptionMethod = null;
+
+            //Validate input
+            if (ldapHostNameQ.getValue() == null) {
+                ldapHostNameQ.setErrorMsg("LDAP host name cannot be empty.");
+            } else {
+                ldapHostName = ldapHostNameQ.getValue().toString();
+            }
+
+            if (ldapPortQ.getValue() == null) {
+                ldapPortQ.setErrorMsg("LDAP port number cannot be empty.");
+            } else {
+                ldapPort = ldapPortQ.getValue().toString();
+            }
+
+            if (ldapEncryptionMethodQ.getValue() == null || !Arrays.asList(LDAP_ENCRYPTION_METHODS)
+                    .contains(ldapEncryptionMethodQ.getValue().toString())) {
+                ldapEncryptionMethodQ.setErrorMsg("Invalid encryption method.");
+            } else {
+                ldapEncryptionMethod = ldapEncryptionMethodQ.getValue().toString();
+            }
+
+            if (StringUtils.isEmpty(ldapHostName) || StringUtils.isEmpty(ldapPort)
+                    || StringUtils.isEmpty(ldapEncryptionMethod)) {
+                ldapNetworkSettingsStage.setForm(ldapNetworkSettingsForm);
+            }
+
+            return ldapNetworkSettingsStage;
+        }
+
+        public Stage testFields(Stage ldapNetworkSettingsStage, Map<String, String> params) {
+            boolean skipConnectionTest =
+                    params.get("skip") == null ? false : Boolean.getBoolean(params.get("skip"));
+            boolean connectionSuccessful = false;
+            if (!skipConnectionTest) {
+                //TODO: test ldap connection here
+                connectionSuccessful = true;
+            }
+
+            if (!connectionSuccessful && !skipConnectionTest) {
+                ldapNetworkSettingsStage.clearAction();
+                ldapNetworkSettingsStage.addAction(defaultAction);
+                ldapNetworkSettingsStage.addAction(new Action(POST,
+                        "/security/wizard/network?skip=true",
+                        "skip"));
+            }
+
+            return ldapNetworkSettingsStage;
+        }
+
+        public Stage setNewState(Stage currentStage, Map<String, String> params) {
+            Map<String, Object> newState = currentStage.getState();
+            if(newState == null) {
+                newState = new HashMap<>();
+            }
+
+            newState.put(LDAP_HOST_NAME_ID, currentStage.getForm().getQuestionValue(LDAP_HOST_NAME_ID));
+            newState.put(LDAP_PORT_ID, currentStage.getForm().getQuestionValue(LDAP_PORT_ID));
+            newState.put(LDAP_ENCRYPTION_METHOD, currentStage.getForm().getQuestionValue(LDAP_ENCRYPTION_METHOD));
+            currentStage.setState(newState);
+            return currentStage;
+        }
+
+        public Stage getNextStage(Stage prevStage, Map<String, String> params) {
+            return getLdapBindUserSettingsStage(newState);
+        }
+    }
+
     public static class Question<T> {
         private String label;
 
@@ -402,7 +539,7 @@ public class LdapWizard implements SparkApplication {
         }
 
         public String getErrorMsg() {
-
+            return errorMsg;
         }
     }
 
@@ -448,100 +585,57 @@ public class LdapWizard implements SparkApplication {
 
         public boolean containsErrorMsgs(){
             for(Question q : questions) {
-                if(q.errorMsg)
+                if(!StringUtils.isEmpty(q.errorMsg)) {
+                    return true;
+                }
             }
+            return false;
         }
     }
 
-    public static class Action {
-        public ActionMethod method;
 
-        public String url;
 
-        public String label;
-
-        public Action(ActionMethod method, String url, String label) {
-            this.method = method;
-            this.url = url;
-            this.label = label;
-        }
-    }
-
-    public static class LdapNetworkSettingsStage extends Stage {
-        
-        Form form = Form.builder("LDAP Network Settings")
-                .add(Question.builder(LDAP_HOST_NAME_ID, HOSTNAME)
-        .label("LDAP Host name"))
-                .add(Question.builder(LDAP_PORT_ID, PORT)
-        .defaults(389, 636)
-        .label("LDAP Port"))
-                .add(Question.builder(LDAP_ENCRYPTION_METHOD, STRING_ENUM)
-        .defaults(LDAP_ENCRYPTION_METHODS)
-        .label("Encryption method"));
-        
-        public LdapNetworkSettingsStage() {
-            super(null ,null, null);
-        }
-        
-        public Stage validate(Request req) {
-            Stage ldapNetworkSettingsStage = Boon.fromJson(req.body(), Stage.class);
-            Map<String, String> params = req.params();
-
-            validateFields().getForm().
-
-        }
-        
-        public Stage validateFields(Stage ldapNetworkSettingsStage, Map<String, String> params) {
-            Form ldapNetworkSettingsForm = ldapNetworkSettingsStage.getForm();
-            Question ldapHostNameQ = ldapNetworkSettingsForm.getQuestion(LDAP_HOST_NAME_ID);
-            Question ldapPortQ = ldapNetworkSettingsForm.getQuestion(LDAP_PORT_ID);
-            Question ldapEncryptionMethodQ =
-                    ldapNetworkSettingsForm.getQuestion(LDAP_ENCRYPTION_METHOD);
-
-            String ldapHostName = null;
-            String ldapPort = null;
-            String ldapEncryptionMethod = null;
-
-            //Validate input
-            if (ldapHostNameQ.getValue() == null) {
-                ldapHostNameQ.setErrorMsg("LDAP host name cannot be empty.");
-            } else {
-                ldapHostName = ldapHostNameQ.getValue().toString();
-            }
-
-            if (ldapPortQ.getValue() == null) {
-                ldapPortQ.setErrorMsg("LDAP port number cannot be empty.");
-            } else {
-                ldapPort = ldapPortQ.getValue().toString();
-            }
-
-            if (ldapEncryptionMethodQ.getValue() == null || !Arrays.asList(LDAP_ENCRYPTION_METHODS)
-                    .contains(ldapEncryptionMethodQ.getValue().toString())) {
-                ldapEncryptionMethodQ.setErrorMsg("Invalid encryption method.");
-            } else {
-                ldapEncryptionMethod = ldapEncryptionMethodQ.getValue().toString();
-            }
-
-            if (StringUtils.isEmpty(ldapHostName) || StringUtils.isEmpty(ldapPort)
-                    || StringUtils.isEmpty(ldapEncryptionMethod)) {
-                ldapNetworkSettingsStage.setForm(ldapNetworkSettingsForm);
-            }
-
-            return ldapNetworkSettingsStage;
-        }
-        
-        public Stage validate() {
-            
-        }
-    }
-    public static class Stage {
+    public static abstract class Stage {
         private Form form;
 
         private Map<String, Object> state;
 
         private List<Action> actions;
 
-        public Stage(Form form, Map<String, Object> state, Action action, Action... otherActions) {
+        public Stage() {
+            state = new HashMap<>();
+            actions = new ArrayList<>();
+        }
+
+        public abstract Stage validateFields(Stage stageToCheck, Map<String, String> params);
+
+        public abstract Stage testFields(Stage stageToTest, Map<String, String> params);
+
+        public abstract Stage setNewState(Stage currentStage, Map<String, String> params);
+
+        public abstract Stage getNextStage(Stage prevStage, Map<String, String> params);
+
+        public Stage procces(Request req) {
+            Stage currentStage = Boon.fromJson(req.body(), Stage.class);
+            Map<String, String> params = req.params();
+
+            Stage validatedStage = validateFields(currentStage, params);
+            if (validatedStage.getForm()
+                    .containsErrorMsgs()) {
+                return validatedStage;
+            }
+
+            Stage testedStage = testFields(currentStage, params);
+            if (testedStage.getForm()
+                    .containsErrorMsgs()) {
+                return testedStage;
+            }
+
+            return getNextStage(setNewState(currentStage, params), params);
+        }
+
+        public void setStage(Form form, Map<String, Object> state, Action action,
+                Action... otherActions) {
             this.form = form;
             this.state = state;
             this.actions = new ArrayList<>();
@@ -549,12 +643,12 @@ public class LdapWizard implements SparkApplication {
             actions.addAll(Arrays.asList(otherActions));
         }
 
-        public Stage(Form form, Action action, Action... otherActions) {
-            this(form, new HashMap<>(), action, otherActions);
-        }
-
         public Map<String, Object> getState() {
             return state;
+        }
+
+        public void setState(Map<String, Object> state) {
+            this.state = state;
         }
 
         public Form getForm() {
@@ -571,10 +665,6 @@ public class LdapWizard implements SparkApplication {
 
         public void addAction(Action action) {
             actions.add(action);
-        }
-
-        public void addState(String key, Object val) {
-            state.put(key, val);
         }
     }
 }
