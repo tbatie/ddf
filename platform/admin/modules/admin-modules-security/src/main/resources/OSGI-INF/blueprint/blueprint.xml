@@ -23,12 +23,12 @@
                 <ref component-id="ldapWiz"/>
             </list>
         </property>
-        <property name="filterMappingPattern" value="/admin/security/wizard/*"/>
+        <property name="filterMappingPattern" value="/admin/wizard/ldap/*"/>
     </bean>
 
     <service ref="sparkServlet" interface="javax.servlet.Servlet">
         <service-properties>
-            <entry key="urlPatterns" value="/admin/security/wizard/*"/>
+            <entry key="urlPatterns" value="/admin/wizard/ldap/*"/>
         </service-properties>
     </service>
 
