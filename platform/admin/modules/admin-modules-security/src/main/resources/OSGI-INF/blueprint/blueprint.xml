@@ -17,18 +17,36 @@
     <service interface="org.codice.ddf.ui.admin.api.module.AdminModule" ref="securityModule"/>
 
     <bean id="ldapWiz" class="org.codice.ui.admin.security.LdapWizard"/>
-    <bean id="sparkServlet" class="org.codice.ui.admin.security.SparkServlet">
+
+    <bean id="diffLdapWiz" class="org.codice.ui.admin.security.DiffLdapWizard"/>
+
+    <!--<bean id="sparkServlet" class="org.codice.ui.admin.security.SparkServlet">-->
+        <!--<property name="sparkApplications">-->
+            <!--<list>-->
+                <!--<ref component-id="ldapWiz"/>-->
+            <!--</list>-->
+        <!--</property>-->
+        <!--<property name="filterMappingPattern" value="/admin/wizard/ldap/*"/>-->
+    <!--</bean>-->
+
+    <!--<service ref="sparkServlet" interface="javax.servlet.Servlet">-->
+        <!--<service-properties>-->
+            <!--<entry key="urlPatterns" value="/admin/wizard/ldap/*"/>-->
+        <!--</service-properties>-->
+    <!--</service>-->
+
+    <bean id="sparkServlet2" class="org.codice.ui.admin.security.SparkServlet">
         <property name="sparkApplications">
             <list>
-                <ref component-id="ldapWiz"/>
+                <ref component-id="diffLdapWiz"/>
             </list>
         </property>
-        <property name="filterMappingPattern" value="/admin/wizard/ldap/*"/>
+        <property name="filterMappingPattern" value="/admin/wizard/diffldap/*"/>
     </bean>
 
-    <service ref="sparkServlet" interface="javax.servlet.Servlet">
+    <service ref="sparkServlet2" interface="javax.servlet.Servlet">
         <service-properties>
-            <entry key="urlPatterns" value="/admin/wizard/ldap/*"/>
+            <entry key="urlPatterns" value="/admin/wizard/diffldap/*"/>
         </service-properties>
     </service>
 

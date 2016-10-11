@@ -1,7 +1,5 @@
 package org.codice.ui.admin.security.stage;
 
-import org.codice.ui.admin.security.LdapWizard;
-
 public class Action {
     public ActionMethod method;
 

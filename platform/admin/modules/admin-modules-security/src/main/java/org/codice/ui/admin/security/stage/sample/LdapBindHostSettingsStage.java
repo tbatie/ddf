@@ -1,7 +1,5 @@
 package org.codice.ui.admin.security.stage.sample;
 
-import static org.codice.ui.admin.security.LdapWizard.BIND_USER_DN;
-import static org.codice.ui.admin.security.LdapWizard.BIND_USER_PASS;
 import static org.codice.ui.admin.security.stage.Action.ActionMethod.POST;
 import static org.codice.ui.admin.security.stage.Stage.DataType.PASSWORD;
 import static org.codice.ui.admin.security.stage.Stage.DataType.STRING;
@@ -20,15 +18,36 @@ public class LdapBindHostSettingsStage extends Stage {
 
     public static final String LDAP_BIND_HOST_SETTINGS_STAGE_ID = "ldapBindHostSettingsStageId";
 
+    public static final String BIND_USER_DN = "bindUserDN";
+
+    public static final String BIND_USER_PASS = "bindUserPassword";
+
     public LdapBindHostSettingsStage(Map<String, String> state, String wizardUrl) {
         super(state, wizardUrl);
     }
 
     @Override
+    public Form getDefaultForm() {
+        return Form.builder("LDAP Bind User Settings")
+                .add(Question.builder(BIND_USER_DN, STRING)
+                        .label("LDAP Bind User DN"))
+                .add(Question.builder(BIND_USER_PASS, PASSWORD)
+                        .label("LDAP Bind User Password"));
+    }
+
+
+    @Override
+    public List<Action> getDefaultActions() {
+        List<Action> actions = new ArrayList<>();
+        actions.add(new Action(POST, getWizardUrl() + "/" + getStageId(), "check"));
+        return actions;
+    }
+
+    @Override
     public Stage validateFields(Stage stageToCheck, Map<String, String> params) {
-        Question bindUserDNQ = (Question) stageToCheck.getForm()
+        Question bindUserDNQ = stageToCheck.getForm()
                 .getContent(BIND_USER_DN);
-        Question bindUserPassQ = (Question) stageToCheck.getForm()
+        Question bindUserPassQ = stageToCheck.getForm()
                 .getContent(BIND_USER_PASS);
 
         if (bindUserDNQ.getValue() == null) {
@@ -81,23 +100,12 @@ public class LdapBindHostSettingsStage extends Stage {
     }
 
     @Override
-    public Form getDefaultForm() {
-        return Form.builder("LDAP Bind User Settings")
-                .add(Question.builder(BIND_USER_DN, STRING)
-                        .label("LDAP Bind User DN"))
-                .add(Question.builder(BIND_USER_PASS, PASSWORD)
-                        .label("LDAP Bind User Password"));
-    }
-
-    @Override
-    public List<Action> getDefaultActions() {
-        List<Action> actions = new ArrayList<>();
-        actions.add(new Action(POST, getWizardUrl() + "/" + LDAP_BIND_HOST_SETTINGS_STAGE_ID, "check"));
-        return actions;
-    }
-
-    @Override
     public String getStageId() {
         return LDAP_BIND_HOST_SETTINGS_STAGE_ID;
+    }
+
+    @Override
+    public Stage getNewStage(Map<String, String> state, String wizardUrl) {
+        return new LdapBindHostSettingsStage(state, wizardUrl);
     }
 }

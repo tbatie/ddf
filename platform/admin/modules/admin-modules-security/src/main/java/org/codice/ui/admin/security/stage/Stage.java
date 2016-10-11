@@ -1,5 +1,6 @@
 package org.codice.ui.admin.security.stage;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,8 +12,6 @@ import org.codice.ui.admin.security.stage.form.Form;
 public abstract class Stage {
 
     public static final String NEXT_STAGE_ID = "nextStageId";
-
-    private String stageId;
 
     private Form form;
 
@@ -40,6 +39,8 @@ public abstract class Stage {
     public abstract List<Action> getDefaultActions();
 
     public abstract String getStageId();
+
+    public abstract Stage getNewStage(Map<String, String> state, String wizardUrl);
 
     public Map<String, String> getState() {
         return state;

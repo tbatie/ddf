@@ -36,12 +36,11 @@ public class LdapNetworkSettingsStage extends Stage {
     @Override
     public Stage validateFields(Stage ldapNetworkSettingsStage, Map<String, String> params) {
         Form ldapNetworkSettingsForm = ldapNetworkSettingsStage.getForm();
-        Question ldapHostNameQ = (Question) ldapNetworkSettingsForm.getContent(LDAP_HOST_NAME_ID);
-        Question ldapPortQ = (Question) ldapNetworkSettingsForm.getContent(LDAP_PORT_ID);
-        Question ldapEncryptionMethodQ = (Question) ldapNetworkSettingsForm.getContent(
+        Question ldapHostNameQ = ldapNetworkSettingsForm.getContent(LDAP_HOST_NAME_ID);
+        Question ldapPortQ = ldapNetworkSettingsForm.getContent(LDAP_PORT_ID);
+        Question ldapEncryptionMethodQ = ldapNetworkSettingsForm.getContent(
                 LDAP_ENCRYPTION_METHOD);
 
-        //Validate input
         if (ldapHostNameQ.getValue() == null) {
             ldapHostNameQ.setError("LDAP host name cannot be empty.");
         }
@@ -118,6 +117,11 @@ public class LdapNetworkSettingsStage extends Stage {
         List<Action> actions = new ArrayList<>();
         actions.add(new Action(POST, getWizardUrl() + "/" + LDAP_NETWORK_SETTINGS_STAGE_ID, "check"));
         return actions;
+    }
+
+    @Override
+    public Stage getNewStage(Map<String, String> state, String wizardUrl) {
+        return new LdapNetworkSettingsStage(state, wizardUrl);
     }
 
     @Override

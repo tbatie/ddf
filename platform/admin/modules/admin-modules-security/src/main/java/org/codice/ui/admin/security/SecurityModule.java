@@ -29,7 +29,7 @@ public class SecurityModule implements AdminModule {
     @Override
     public URI getIframeLocation() {
         try {
-            return new URI("./security/wizard");
+            return new URI("./security");
         } catch (URISyntaxException e) {
             return null;
         }

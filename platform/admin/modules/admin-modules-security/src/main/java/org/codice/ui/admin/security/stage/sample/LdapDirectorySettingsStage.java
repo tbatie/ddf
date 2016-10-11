@@ -1,8 +1,5 @@
 package org.codice.ui.admin.security.stage.sample;
 
-import static org.codice.ui.admin.security.LdapWizard.BASE_GROUP_DN;
-import static org.codice.ui.admin.security.LdapWizard.BASE_USERNAME_ATTRIBUTE;
-import static org.codice.ui.admin.security.LdapWizard.BASE_USER_DN;
 import static org.codice.ui.admin.security.stage.Action.ActionMethod.POST;
 import static org.codice.ui.admin.security.stage.Stage.DataType.STRING;
 
@@ -19,6 +16,13 @@ import org.codice.ui.admin.security.stage.form.Question;
 public class LdapDirectorySettingsStage extends Stage {
 
     public static final String LDAP_DIRECTORY_SETTINGS_STAGE_ID = "ldapDirectorySetttingStage";
+
+
+    public static final String BASE_USER_DN = "baseUserDN";
+
+    public static final String BASE_USERNAME_ATTRIBUTE = "baseUserNameAttribute";
+
+    public static final String BASE_GROUP_DN = "baseGroupDN";
 
     public LdapDirectorySettingsStage(Map<String, String> state, String wizardUrl) {
         super(state, wizardUrl);
@@ -104,6 +108,11 @@ public class LdapDirectorySettingsStage extends Stage {
         List<Action> actions = new ArrayList<>();
         actions.add(new Action(POST, getWizardUrl() + "/" + LDAP_DIRECTORY_SETTINGS_STAGE_ID, "check"));
         return actions;
+    }
+
+    @Override
+    public Stage getNewStage(Map<String, String> state, String wizardUrl) {
+        return new LdapDirectorySettingsStage(state, wizardUrl);
     }
 
     @Override

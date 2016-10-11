@@ -1,6 +1,7 @@
 package org.codice.ui.admin.security.stage.sample;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -66,6 +67,11 @@ public class SetupUserStoreStage extends Stage {
     @Override
     public List<Action> getDefaultActions() {
         return null;
+    }
+
+    @Override
+    public Stage getNewStage(Map<String, String> state, String wizardUrl) {
+        return new SetupUserStoreStage(state, wizardUrl);
     }
 
     @Override
