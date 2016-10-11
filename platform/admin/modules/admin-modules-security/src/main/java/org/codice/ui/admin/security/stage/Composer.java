@@ -1,21 +1,10 @@
 package org.codice.ui.admin.security.stage;
 
 import static org.codice.ui.admin.security.stage.Stage.NEXT_STAGE_ID;
-import static org.codice.ui.admin.security.stage.sample.CustomStage.CUSTOM_STAGE_ID;
-import static org.codice.ui.admin.security.stage.sample.LdapBindHostSettingsStage.LDAP_BIND_HOST_SETTINGS_STAGE_ID;
-import static org.codice.ui.admin.security.stage.sample.LdapDirectorySettingsStage.LDAP_DIRECTORY_SETTINGS_STAGE_ID;
-import static org.codice.ui.admin.security.stage.sample.LdapNetworkSettingsStage.LDAP_NETWORK_SETTINGS_STAGE_ID;
-import static org.codice.ui.admin.security.stage.sample.SetupUserStoreStage.SETUP_USER_STORE_STAGE_ID;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import org.codice.ui.admin.security.StageProbe;
-import org.codice.ui.admin.security.stage.sample.CustomStage;
-import org.codice.ui.admin.security.stage.sample.LdapBindHostSettingsStage;
-import org.codice.ui.admin.security.stage.sample.LdapDirectorySettingsStage;
-import org.codice.ui.admin.security.stage.sample.LdapNetworkSettingsStage;
-import org.codice.ui.admin.security.stage.sample.SetupUserStoreStage;
 import org.springframework.util.StringUtils;
 
 public class Composer {

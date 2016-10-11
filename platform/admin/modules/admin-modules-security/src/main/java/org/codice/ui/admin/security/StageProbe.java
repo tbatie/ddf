@@ -16,9 +16,6 @@ import com.google.common.collect.ImmutableList;
 
 import spark.Request;
 
-/**
- * Created by tbatie1 on 10/10/16.
- */
 public class StageProbe {
 
     static List<Stage> stages = ImmutableList.of(new CustomStage(null, null),

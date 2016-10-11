@@ -26,6 +26,7 @@ public class LdapWizard implements SparkApplication {
 
     @Override
     public void init() {
+
         get("/:stageId", (req, res) -> {
             return StageProbe.getStage(req.params(":stageId"), new HashMap<>(), getContextPath());
         }, Boon::toJson);
