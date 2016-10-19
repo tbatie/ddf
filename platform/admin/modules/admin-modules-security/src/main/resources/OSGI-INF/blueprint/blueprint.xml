@@ -12,42 +12,40 @@
  **/
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+    <!--TODO: Really not a fan of the way we register stages with the stage finder. currently init a bean that registers the class and id with stage finder -->
+    <bean id="stageFinder" class="org.codice.ui.admin.security.stage.StageFinder"/>
+    <service ref="stageFinder" interface="org.codice.ui.admin.security.stage.IStageFinder"/>
 
-    <bean id="securityModule" class="org.codice.ui.admin.security.SecurityModule"/>
-    <service interface="org.codice.ddf.ui.admin.api.module.AdminModule" ref="securityModule"/>
-
-    <bean id="ldapWiz" class="org.codice.ui.admin.security.LdapWizard"/>
-
-    <bean id="diffLdapWiz" class="org.codice.ui.admin.security.DiffLdapWizard"/>
-
-    <!--<bean id="sparkServlet" class="org.codice.ui.admin.security.SparkServlet">-->
-        <!--<property name="sparkApplications">-->
-            <!--<list>-->
-                <!--<ref component-id="ldapWiz"/>-->
-            <!--</list>-->
-        <!--</property>-->
-        <!--<property name="filterMappingPattern" value="/admin/wizard/ldap/*"/>-->
-    <!--</bean>-->
-
-    <!--<service ref="sparkServlet" interface="javax.servlet.Servlet">-->
-        <!--<service-properties>-->
-            <!--<entry key="urlPatterns" value="/admin/wizard/ldap/*"/>-->
-        <!--</service-properties>-->
-    <!--</service>-->
-
-    <bean id="sparkServlet2" class="org.codice.ui.admin.security.SparkServlet">
-        <property name="sparkApplications">
-            <list>
-                <ref component-id="diffLdapWiz"/>
-            </list>
-        </property>
-        <property name="filterMappingPattern" value="/admin/wizard/diffldap/*"/>
+    <bean id="ldapBindHostStage" class="org.codice.ui.admin.security.stage.sample.LdapBindHostSettingsStage">
+        <argument ref="stageFinder"/>
     </bean>
 
-    <service ref="sparkServlet2" interface="javax.servlet.Servlet">
+    <bean id="ldapDirStage" class="org.codice.ui.admin.security.stage.sample.LdapDirectorySettingsStage">
+        <argument ref="stageFinder"/>
+    </bean>
+
+    <bean id="ldapNetworkStage" class="org.codice.ui.admin.security.stage.sample.LdapNetworkSettingsStage">
+        <argument ref="stageFinder"/>
+    </bean>
+
+    <bean id="ldapWiz" class="org.codice.ui.admin.security.LdapWizard">
+        <argument ref="stageFinder"/>
+    </bean>
+
+    <bean id="sparkServlet" class="org.codice.ui.admin.security.SparkServlet">
+        <property name="sparkApplications">
+            <list>
+                <ref component-id="ldapWiz"/>
+            </list>
+        </property>
+        <property name="filterMappingPattern" value="/admin/wizard/ldap/*"/>
+    </bean>
+    <service ref="sparkServlet" interface="javax.servlet.Servlet">
         <service-properties>
-            <entry key="urlPatterns" value="/admin/wizard/diffldap/*"/>
+            <entry key="urlPatterns" value="/admin/wizard/ldap/*"/>
         </service-properties>
     </service>
 
+    <bean id="securityModule" class="org.codice.ui.admin.security.SecurityModule"/>
+    <service ref="securityModule" interface="org.codice.ddf.ui.admin.api.module.AdminModule"/>
 </blueprint>

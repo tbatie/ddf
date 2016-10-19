@@ -1,18 +1,18 @@
 package org.codice.ui.admin.security.stage.sample;
 
 import static org.codice.ui.admin.security.stage.Action.ActionMethod.POST;
-import static org.codice.ui.admin.security.stage.Stage.DataType.PASSWORD;
-import static org.codice.ui.admin.security.stage.Stage.DataType.STRING;
+import static org.codice.ui.admin.security.stage.components.Component.ComponentType.BUTTON;
+import static org.codice.ui.admin.security.stage.components.Component.ComponentType.PASSWORD;
+import static org.codice.ui.admin.security.stage.components.Component.ComponentType.STRING;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.codice.ui.admin.security.stage.StageFinder;
+import org.codice.ui.admin.security.stage.StageParameters;
+import org.codice.ui.admin.security.config.Configuration;
 import org.codice.ui.admin.security.stage.Action;
 import org.codice.ui.admin.security.stage.Stage;
-import org.codice.ui.admin.security.stage.form.Form;
-import org.codice.ui.admin.security.stage.form.Question;
+import org.codice.ui.admin.security.stage.components.Component;
 
 public class LdapBindHostSettingsStage extends Stage {
 
@@ -22,50 +22,52 @@ public class LdapBindHostSettingsStage extends Stage {
 
     public static final String BIND_USER_PASS = "bindUserPassword";
 
-    public LdapBindHostSettingsStage(Map<String, String> state, String wizardUrl) {
-        super(state, wizardUrl);
+    public LdapBindHostSettingsStage(StageFinder stageFinder) {
+        super(stageFinder);
+    }
+
+    public LdapBindHostSettingsStage(StageParameters stageParameters) {
+        super(stageParameters);
     }
 
     @Override
-    public Form getDefaultForm() {
-        return Form.builder("LDAP Bind User Settings")
-                .add(Question.builder(BIND_USER_DN, STRING)
-                        .label("LDAP Bind User DN"))
-                .add(Question.builder(BIND_USER_PASS, PASSWORD)
-                        .label("LDAP Bind User Password"));
-    }
-
-
-    @Override
-    public List<Action> getDefaultActions() {
-        List<Action> actions = new ArrayList<>();
-        actions.add(new Action(POST, getWizardUrl() + "/" + getStageId(), "check"));
-        return actions;
+    public void registerStage(StageFinder stageFinder) {
+        stageFinder.registerStage(getStageId(), LdapBindHostSettingsStage::new);
     }
 
     @Override
-    public Stage validateFields(Stage stageToCheck, Map<String, String> params) {
-        Question bindUserDNQ = stageToCheck.getForm()
-                .getContent(BIND_USER_DN);
-        Question bindUserPassQ = stageToCheck.getForm()
-                .getContent(BIND_USER_PASS);
+    public Component getDefaultRootComponent() {
+        Action validateStageBtn = new Action(POST, getWizardUrl() + "/" + getStageId(), "check");
+        return Component.builder("LDAP Bind User Settings", Component.ComponentType.BASE_CONTAINER)
+                .subComponents(Component.builder(BIND_USER_DN, STRING)
+                                .title("LDAP Bind User DN"),
+                        Component.builder(BIND_USER_PASS, PASSWORD)
+                                .title("LDAP Bind User Password"),
+                        Component.builder(null, BUTTON)
+                                .defaults(validateStageBtn));
+    }
+
+    @Override
+    public Stage validateStage(Stage stageToCheck, Map<String, String> params) {
+        Component bindUserDNQ = stageToCheck.getComponent(BIND_USER_DN);
+        Component bindUserPassQ = stageToCheck.getComponent(BIND_USER_PASS);
 
         if (bindUserDNQ.getValue() == null) {
-            bindUserDNQ.setError("Invalid bind user DN");
+            bindUserDNQ.addError("Invalid bind user DN");
         }
 
         if (bindUserPassQ.getValue() == null) {
-            bindUserPassQ.setError("Invalid password entry");
+            bindUserPassQ.addError("Invalid password entry");
         }
 
         return stageToCheck;
     }
 
     @Override
-    public Stage testFields(Stage stageToTest, Map<String, String> params) {
+    public Stage testStage(Stage stageToTest, Map<String, String> params) {
         //Test ldap connection
-        boolean skipConnectionTest = params.get("skip") == null ? false : Boolean.getBoolean(
-                params.get("skip"));
+        boolean skipConnectionTest =
+                params.get("skip") == null ? false : Boolean.getBoolean(params.get("skip"));
         boolean connectionSuccessful = false;
         if (!skipConnectionTest) {
             //// TODO: tbatie - 10/5/16 - Test bind user connection
@@ -73,39 +75,32 @@ public class LdapBindHostSettingsStage extends Stage {
         }
 
         if (!connectionSuccessful && !skipConnectionTest) {
-            stageToTest.clearAction();
-            stageToTest.addActions(getDefaultActions());
-            stageToTest.addAction(new Action(POST,
-                    getWizardUrl() + "?skip=true",
-                    "skip"));
+            stageToTest.getRootComponent()
+                    .subComponents(Component.builder(null, BUTTON)
+                            .defaults(new Action(POST, getWizardUrl() + "?skip=true", "skip")));
         }
 
         return stageToTest;
     }
 
     @Override
-    public Stage setNewState(Stage currentStage, Map<String, String> params) {
-        Map<String, String> newState = currentStage.getState();
-        if (newState == null) {
-            newState = new HashMap<>();
+    public Stage commitStage(Stage currentStage, Map<String, String> params) {
+        Configuration newConfiguration = currentStage.getConfiguration();
+        if (newConfiguration == null) {
+            newConfiguration = new Configuration();
         }
-        newState.put(BIND_USER_DN,
-                currentStage.getForm()
-                        .getContentValue(BIND_USER_DN).toString());
-        newState.put(BIND_USER_PASS,
-                currentStage.getForm()
-                        .getContentValue(BIND_USER_PASS).toString());
-        currentStage.setState(newState);
+        newConfiguration.addValue(BIND_USER_DN,
+                currentStage.getComponent(BIND_USER_DN)
+                        .getValue());
+        newConfiguration.addValue(BIND_USER_PASS,
+                currentStage.getComponent(BIND_USER_PASS)
+                        .getValue());
+        currentStage.setConfiguration(newConfiguration);
         return currentStage;
     }
 
     @Override
     public String getStageId() {
         return LDAP_BIND_HOST_SETTINGS_STAGE_ID;
-    }
-
-    @Override
-    public Stage getNewStage(Map<String, String> state, String wizardUrl) {
-        return new LdapBindHostSettingsStage(state, wizardUrl);
     }
 }

@@ -1,10 +1,9 @@
 package org.codice.ui.admin.security.stage;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.codice.ui.admin.security.stage.form.Form;
+import org.codice.ui.admin.security.config.Configuration;
+import org.codice.ui.admin.security.stage.components.Component;
 
 /**
  * Created by tbatie123 on 10/10/16.
@@ -13,34 +12,36 @@ public abstract class Stage {
 
     public static final String NEXT_STAGE_ID = "nextStageId";
 
-    private Form form;
+    protected Configuration configuration;
+
+    private Component rootComponent;
 
     private Map<String, String> state;
 
-    private List<Action> actions;
-
     private String wizardUrl;
 
-    public Stage(Map<String, String> state, String wizardUrl) {
-        this.state = state;
-        this.wizardUrl = wizardUrl;
-        this.form = getDefaultForm();
-        this.actions =  getDefaultActions();
+    public Stage(StageFinder stageFinder){
+        registerStage(stageFinder);
     }
 
-    public abstract Stage validateFields(Stage stageToCheck, Map<String, String> params);
+    public Stage(StageParameters stageParameters){
+        wizardUrl = stageParameters.getWizardUrl();
+        state = stageParameters.getState();
+        configuration = stageParameters.getConfiguration();
+        rootComponent = getDefaultRootComponent();
+    }
 
-    public abstract Stage testFields(Stage stageToTest, Map<String, String> params);
+    public abstract void registerStage(StageFinder stageFinder);
 
-    public abstract Stage setNewState(Stage currentStage, Map<String, String> params);
+    public abstract Stage validateStage(Stage stageToCheck, Map<String, String> params);
 
-    public abstract Form getDefaultForm();
+    public abstract Stage testStage(Stage stageToTest, Map<String, String> params);
 
-    public abstract List<Action> getDefaultActions();
+    public abstract Stage commitStage(Stage currentStage, Map<String, String> params);
+
+    public abstract Component getDefaultRootComponent();
 
     public abstract String getStageId();
-
-    public abstract Stage getNewStage(Map<String, String> state, String wizardUrl);
 
     public Map<String, String> getState() {
         return state;
@@ -50,39 +51,39 @@ public abstract class Stage {
         this.state = state;
     }
 
-    public Form getForm() {
-        return form;
+    public Configuration getConfiguration(){
+        return configuration;
     }
 
-    public void setForm(Form form) {
-        this.form = form;
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
+    public Component getRootComponent() {
+        return rootComponent;
+    }
+
+    public Component getComponent(String componentId) {
+        return rootComponent.getComponent(componentId);
+    }
+
+    public void setDefaultRootComponent(Component defaultRootComponent) {
+        this.rootComponent = defaultRootComponent;
     }
 
     public String getWizardUrl() {
         return wizardUrl;
     }
 
-    public void clearAction() {
-        actions.clear();
-    }
-
-    public void addAction(Action action) {
-        actions.add(action);
-    }
-
-    public void addActions(List<Action> action) {
-        actions.addAll(action);
+    public void setWizardUrl(String wizardUrl) {
+        this.wizardUrl = wizardUrl;
     }
 
     public boolean containsError() {
-        return form.containsErrors();
+        return rootComponent.containsErrors();
     }
 
     public void clearErrors(){
-        form.clearErrors();
-    }
-
-    public enum DataType {
-        URL, PORT, HOSTNAME, STRING_ENUM, STRING, PASSWORD
+        rootComponent.clearAllErrors();
     }
 }
