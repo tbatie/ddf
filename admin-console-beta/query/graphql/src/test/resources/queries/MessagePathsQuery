@@ -1,0 +1,20 @@
+query TestMessagePaths {
+  testing {
+    path {
+      path2 {
+        path3 {
+          returnErrors(testObj: {list: ["str"]}) {
+            integer
+            boolean
+            string
+            list
+            enumeration
+            innerObjectField {
+                testSubField
+            }
+          }
+        }
+      }
+    }
+  }
+}
