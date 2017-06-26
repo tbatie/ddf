@@ -1,0 +1,10 @@
+query MissingRequiredArg {
+  testing {
+    requiredArg {
+      string
+      integer
+      list
+      enumeration
+    }
+  }
+}

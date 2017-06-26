@@ -1,0 +1,18 @@
+query TestGetBaseValues {
+  testing {
+    getInteger
+    getBoolean
+    getString
+    getList {
+      integer
+      boolean
+      string
+      list
+      enumeration
+      innerObjectField {
+        testSubField
+      }
+    }
+    getEnum
+  }
+}

@@ -1,0 +1,57 @@
+<!--
+/**
+ * Copyright (c) Codice Foundation
+ *
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
+ * version 3 of the License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ *
+ **/
+-->
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+    <service id="ldapFieldProvider" interface="org.codice.ddf.admin.api.FieldProvider">
+        <bean class="org.codice.ddf.admin.ldap.LdapFieldProvider">
+            <argument ref="configuratorFactory"/>
+            <argument ref="featureActions"/>
+            <argument ref="managedServiceActions"/>
+            <argument ref="propertyActions"/>
+            <argument ref="serviceActions"/>
+            <property name="ldapDiscoveryFields" ref="ldapDiscoveryFields"/>
+            <property name="ldapMutationFields" ref="ldapMutationFields"/>
+        </bean>
+    </service>
+
+    <reference-list id="ldapDiscoveryFields"
+                    interface="org.codice.ddf.admin.api.Field"
+                    availability="optional"
+                    filter="(fieldProviderId=query.ldap.*)"/>
+
+    <reference-list id="ldapMutationFields"
+                    interface="org.codice.ddf.admin.api.fields.FunctionField"
+                    availability="optional"
+                    filter="(fieldProviderId=mutation.ldap.*)"/>
+
+    <reference id="configuratorFactory"
+               interface="org.codice.ddf.admin.configurator.ConfiguratorFactory"
+               availability="mandatory" filter="(type=txact)"/>
+
+    <reference id="featureActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.FeatureActions"
+               availability="mandatory"/>
+
+    <reference id="managedServiceActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ManagedServiceActions"
+               availability="mandatory"/>
+
+    <reference id="propertyActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.PropertyActions"
+               availability="mandatory"/>
+
+    <reference id="serviceActions"
+               interface="org.codice.ddf.internal.admin.configurator.actions.ServiceActions"
+               availability="mandatory"/>
+
+</blueprint>
