@@ -1042,6 +1042,7 @@
         <feature prerequisite="true" version="${spring.version}_1">spring</feature>
         <feature prerequisite="true">pax-http-jetty</feature>
         <feature prerequisite="true">pax-jetty</feature>
+        <bundle>mvn:javax.el/javax.el-api/3.0.0</bundle>
         <bundle dependency="true">mvn:com.google.guava/guava/${guava.version}</bundle>
         <bundle start-level="30">mvn:ddf.platform/platform-filter-delegate/${project.version}</bundle>
     </feature>
