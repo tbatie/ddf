@@ -199,6 +199,7 @@
                             catalog-core-api-impl,
                             admin-core-impl
                         </Embed-Dependency>
+                        <Karaf-Commands>org.codice.ddf.itests.common.custom.*</Karaf-Commands>
                     </instructions>
                 </configuration>
             </plugin>

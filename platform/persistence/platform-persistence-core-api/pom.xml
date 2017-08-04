@@ -23,6 +23,7 @@
     <artifactId>persistence-core-api</artifactId>
     <name>DDF :: Persistence :: Core :: API</name>
     <packaging>bundle</packaging>
+
     <properties>
         <persistence.api.version>1.0.0-SNAPSHOT</persistence.api.version>
     </properties>
