@@ -66,12 +66,6 @@
                             <addTransitiveFeatures>false</addTransitiveFeatures>
                             <descriptors>
                                 <descriptor>
-                                    mvn:ddf.platform/platform-app/${project.version}/xml/features
-                                </descriptor>
-                                <descriptor>
-                                    mvn:ddf.security/security-services-app/${project.version}/xml/features
-                                </descriptor>
-                                <descriptor>
                                     mvn:ddf.admin/admin-app/${project.version}/xml/features
                                 </descriptor>
                                 <descriptor>
@@ -100,9 +94,6 @@
                                 </descriptor>
                                 <descriptor>
                                     mvn:org.codice.ddf.registry/registry-app/${project.version}/xml/features
-                                </descriptor>
-                                <descriptor>
-                                    mvn:ddf.distribution/ddf-branding-app/${project.version}/xml/features
                                 </descriptor>
                                 <descriptor>
                                     mvn:ddf.distribution/install-profiles/${project.version}/xml/features
@@ -261,20 +252,6 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>ddf.platform</groupId>
-            <artifactId>platform-app</artifactId>
-            <version>${project.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-        </dependency>
-        <dependency>
-            <groupId>ddf.security</groupId>
-            <artifactId>security-services-app</artifactId>
-            <version>${project.version}</version>
-            <classifier>features</classifier>
-            <type>xml</type>
-        </dependency>
-        <dependency>
             <groupId>ddf.admin</groupId>
             <artifactId>admin-app</artifactId>
             <version>${project.version}</version>
@@ -346,14 +323,21 @@
         </dependency>
         <dependency>
             <groupId>ddf.distribution</groupId>
-            <artifactId>ddf-branding-app</artifactId>
+            <artifactId>install-profiles</artifactId>
             <version>${project.version}</version>
             <classifier>features</classifier>
             <type>xml</type>
         </dependency>
         <dependency>
-            <groupId>ddf.distribution</groupId>
-            <artifactId>install-profiles</artifactId>
+            <groupId>ddf.features</groupId>
+            <artifactId>apps</artifactId>
+            <version>${project.version}</version>
+            <classifier>features</classifier>
+            <type>xml</type>
+        </dependency>
+        <dependency>
+            <groupId>ddf.features</groupId>
+            <artifactId>branding</artifactId>
             <version>${project.version}</version>
             <classifier>features</classifier>
             <type>xml</type>
