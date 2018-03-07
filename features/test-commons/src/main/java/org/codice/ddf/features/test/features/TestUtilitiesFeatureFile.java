@@ -55,6 +55,10 @@ public class TestUtilitiesFeatureFile implements FeatureFile {
     return new FeatureImpl(featureUrl, "feature-testing-utils");
   }
 
+  public static Feature libsTestCommon() {
+    return new FeatureImpl(featureUrl, "libs-test-common");
+  }
+
   public static Feature hamcrestAll() {
     return new FeatureImpl(featureUrl, "hamcrest-all");
   }

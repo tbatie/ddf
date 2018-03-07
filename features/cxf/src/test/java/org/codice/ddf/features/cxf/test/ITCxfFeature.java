@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.features.cxf.test;
 
+import static org.codice.ddf.features.test.config.DebugOptions.defaultDebuggingOptions;
 import static org.codice.ddf.features.test.config.DistributionOptions.includeDependencyPropertiesFile;
 import static org.codice.ddf.features.test.config.DistributionOptions.kernelDistributionOption;
 import static org.codice.ddf.features.test.config.FeatureOptions.addBootFeatureOption;
@@ -50,6 +51,7 @@ public class ITCxfFeature {
   public Option[] examConfiguration() {
     return options(
         kernelDistributionOption(),
+        defaultDebuggingOptions(),
         includeDependencyPropertiesFile(),
         defaultVmOptions(),
         defaultPortsOptions(),

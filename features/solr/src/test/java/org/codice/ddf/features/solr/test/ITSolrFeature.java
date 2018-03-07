@@ -13,6 +13,8 @@
  */
 package org.codice.ddf.features.solr.test;
 
+import static org.codice.ddf.features.test.config.DebugOptions.defaultDebuggingOptions;
+import static org.codice.ddf.features.test.config.DistributionOptions.includeDependencyPropertiesFile;
 import static org.codice.ddf.features.test.config.DistributionOptions.kernelDistributionOption;
 import static org.codice.ddf.features.test.config.FeatureOptions.addBootFeatureOption;
 import static org.codice.ddf.features.test.config.FeatureOptions.addFeaturesToFeatureRepo;
@@ -48,8 +50,10 @@ public class ITSolrFeature {
   public Option[] examConfiguration() {
     return options(
         kernelDistributionOption(),
+        defaultDebuggingOptions(),
         defaultVmOptions(),
         defaultPortsOptions(),
+        includeDependencyPropertiesFile(),
         addFeaturesToFeatureRepo(SolrFeatureFile.featureFile(SOLR_FEATURE_FILE)),
         addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }

@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.features.migration.test;
 
+import static org.codice.ddf.features.test.config.DebugOptions.defaultDebuggingOptions;
 import static org.codice.ddf.features.test.config.DistributionOptions.includeDependencyPropertiesFile;
 import static org.codice.ddf.features.test.config.DistributionOptions.kernelDistributionOption;
 import static org.codice.ddf.features.test.config.FeatureOptions.addBootFeatureOption;
@@ -49,9 +50,10 @@ public class ITMigrationFeature {
   public Option[] examConfiguration() {
     return options(
         kernelDistributionOption(),
-        includeDependencyPropertiesFile(),
+        defaultDebuggingOptions(),
         defaultVmOptions(),
         defaultPortsOptions(),
+        includeDependencyPropertiesFile(),
         addFeaturesToFeatureRepo(MigrationFeatureFile.featureFile(MIGRATION_FEATURE_FILE)),
         addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }

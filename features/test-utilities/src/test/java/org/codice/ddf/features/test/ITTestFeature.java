@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.features.test;
 
+import static org.codice.ddf.features.test.config.DebugOptions.defaultDebuggingOptions;
 import static org.codice.ddf.features.test.config.DistributionOptions.includeDependencyPropertiesFile;
 import static org.codice.ddf.features.test.config.DistributionOptions.kernelDistributionOption;
 import static org.codice.ddf.features.test.config.FeatureOptions.addBootFeatureOption;
@@ -45,9 +46,10 @@ public class ITTestFeature {
   public Option[] examConfiguration() {
     return options(
         kernelDistributionOption(),
-        includeDependencyPropertiesFile(),
+        defaultDebuggingOptions(),
         defaultVmOptions(),
         defaultPortsOptions(),
+        includeDependencyPropertiesFile(),
         addFeaturesToFeatureRepo(TestUtilitiesFeatureFile.featureFile(TEST_FEATURE_FILE)),
         addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }
@@ -57,5 +59,10 @@ public class ITTestFeature {
   @Test
   public void installHamcrestAll() throws FeatureUninstallException, FeatureInstallException {
     featuresService.installAndUninstallFeature(TestUtilitiesFeatureFile.hamcrestAll());
+  }
+
+  @Test
+  public void installLibsTestCommon() throws FeatureUninstallException, FeatureInstallException {
+    featuresService.installAndUninstallFeature(TestUtilitiesFeatureFile.libsTestCommon());
   }
 }

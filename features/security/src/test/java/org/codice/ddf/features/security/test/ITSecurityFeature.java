@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.features.security.test;
 
+import static org.codice.ddf.features.test.config.DebugOptions.defaultDebuggingOptions;
 import static org.codice.ddf.features.test.config.DistributionOptions.includeDependencyPropertiesFile;
 import static org.codice.ddf.features.test.config.DistributionOptions.kernelDistributionOption;
 import static org.codice.ddf.features.test.config.FeatureOptions.addBootFeatureOption;
@@ -50,11 +51,11 @@ public class ITSecurityFeature {
   @Configuration
   public Option[] examConfiguration() {
     return options(
-        keepRuntimeFolder(),
-        includeDependencyPropertiesFile(),
         kernelDistributionOption(),
+        defaultDebuggingOptions(),
         defaultVmOptions(),
         defaultPortsOptions(),
+        includeDependencyPropertiesFile(),
         addFeaturesToFeatureRepo(SecurityFeatureFile.featureFile(SECURITY_FEATURE)),
         addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }
