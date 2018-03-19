@@ -23,9 +23,7 @@ import static org.codice.ddf.features.test.config.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.io.File;
-
 import javax.inject.Inject;
-
 import org.codice.ddf.features.test.FeatureInstallException;
 import org.codice.ddf.features.test.FeatureServiceWrapper;
 import org.codice.ddf.features.test.FeatureUninstallException;

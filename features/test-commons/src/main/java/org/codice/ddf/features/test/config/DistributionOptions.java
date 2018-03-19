@@ -17,7 +17,6 @@ import static org.ops4j.pax.exam.CoreOptions.maven;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import org.codice.ddf.features.test.DependencyVersionResolver;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;

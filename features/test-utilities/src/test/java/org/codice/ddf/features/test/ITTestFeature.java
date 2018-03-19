@@ -23,9 +23,7 @@ import static org.codice.ddf.features.test.config.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.io.File;
-
 import javax.inject.Inject;
-
 import org.codice.ddf.features.test.features.TestUtilitiesFeatureFile;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +38,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITTestFeature {
 
   private static final String TEST_FEATURE_FILE =
-          ITTestFeature.class.getResource(File.separator + "features.xml").getPath();
+      ITTestFeature.class.getResource(File.separator + "features.xml").getPath();
 
   @Configuration
   public Option[] examConfiguration() {

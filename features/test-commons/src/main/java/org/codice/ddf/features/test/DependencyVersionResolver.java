@@ -18,14 +18,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Properties;
-
 import org.ops4j.pax.exam.MavenUtils;
 import org.ops4j.pax.exam.options.MavenUrlReference;
 
 /**
  * Returns dependency versions using a local dependencies.properties file instead of relying on a
  * classloader.
- **/
+ */
 public class DependencyVersionResolver implements MavenUrlReference.VersionResolver {
 
   private DependencyVersionResolver() {}

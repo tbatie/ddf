@@ -14,7 +14,6 @@
 package org.codice.ddf.features.test.config;
 
 import java.util.Arrays;
-
 import org.codice.ddf.features.test.Feature;
 import org.codice.ddf.features.test.FeatureFile;
 import org.ops4j.pax.exam.Option;
