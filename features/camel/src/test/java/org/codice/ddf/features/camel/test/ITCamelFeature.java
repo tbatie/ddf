@@ -23,6 +23,8 @@ import static org.codice.ddf.features.test.config.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.io.File;
+import java.net.URL;
+
 import javax.inject.Inject;
 import org.codice.ddf.features.test.FeatureInstallException;
 import org.codice.ddf.features.test.FeatureServiceWrapper;
@@ -41,8 +43,8 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 @ExamReactorStrategy(PerClass.class)
 public class ITCamelFeature {
 
-  private static final String CAMEL_FEATURE_FILE =
-      ITCamelFeature.class.getResource(File.separator + "features.xml").getPath();
+  private static final URL CAMEL_FEATURE_FILE =
+      ITCamelFeature.class.getResource(File.separator + "features.xml");
 
   @Configuration
   public Option[] examConfiguration() {
@@ -52,7 +54,7 @@ public class ITCamelFeature {
         includeDependencyPropertiesFile(),
         defaultVmOptions(),
         defaultPortsOptions(),
-        addFeaturesToFeatureRepo(CamelFeatureFile.featureFile(CAMEL_FEATURE_FILE)),
+        addFeaturesToFeatureRepo(CamelFeatureFile.featureFile(CAMEL_FEATURE_FILE.getPath())),
         addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }
 

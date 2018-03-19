@@ -31,8 +31,7 @@ public class PortOptions {
         httpPort("9994"),
         ftpPort("9995"),
         rmiRegistryPort("20001"),
-        rmiServerPort("20002"),
-        debugPortOption("5005", Boolean.getBoolean("isDebugEnabled")));
+        rmiServerPort("20002"));
   }
 
   public static Option ddfHome(String path) {

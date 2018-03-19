@@ -23,6 +23,8 @@ import static org.codice.ddf.features.test.config.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.io.File;
+import java.net.URL;
+
 import javax.inject.Inject;
 import org.codice.ddf.features.test.FeatureInstallException;
 import org.codice.ddf.features.test.FeatureServiceWrapper;
@@ -42,8 +44,8 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 @ExamReactorStrategy(PerClass.class)
 public class ITSecurityFeature {
 
-  private static final String SECURITY_FEATURE =
-      ITSecurityFeature.class.getResource(File.separator + "features.xml").getPath();
+  private static final URL SECURITY_FEATURE =
+      ITSecurityFeature.class.getResource(File.separator + "features.xml");
 
   @Configuration
   public Option[] examConfiguration() {
@@ -53,7 +55,7 @@ public class ITSecurityFeature {
         defaultVmOptions(),
         defaultPortsOptions(),
         includeDependencyPropertiesFile(),
-        addFeaturesToFeatureRepo(SecurityFeatureFile.featureFile(SECURITY_FEATURE)),
+        addFeaturesToFeatureRepo(SecurityFeatureFile.featureFile(SECURITY_FEATURE.getPath())),
         addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }
 

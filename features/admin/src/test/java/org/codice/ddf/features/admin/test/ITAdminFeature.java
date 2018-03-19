@@ -23,6 +23,8 @@ import static org.codice.ddf.features.test.config.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.io.File;
+import java.net.URL;
+
 import javax.inject.Inject;
 import org.codice.ddf.features.test.FeatureInstallException;
 import org.codice.ddf.features.test.FeatureServiceWrapper;
@@ -41,8 +43,8 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 @ExamReactorStrategy(PerClass.class)
 public class ITAdminFeature {
 
-  private static final String ADMIN_FEATURE_FILE =
-      ITAdminFeature.class.getResource(File.separator + "features.xml").getPath();
+  private static final URL ADMIN_FEATURE_FILE =
+      ITAdminFeature.class.getResource(File.separator + "features.xml");
 
   @Configuration
   public Option[] examConfiguration() {
@@ -52,7 +54,7 @@ public class ITAdminFeature {
         includeDependencyPropertiesFile(),
         defaultVmOptions(),
         defaultPortsOptions(),
-        addFeaturesToFeatureRepo(AdminFeatureFile.featureFile(ADMIN_FEATURE_FILE)),
+        addFeaturesToFeatureRepo(AdminFeatureFile.featureFile(ADMIN_FEATURE_FILE.getPath())),
         addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }
 

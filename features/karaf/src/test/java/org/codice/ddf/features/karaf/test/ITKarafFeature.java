@@ -23,6 +23,8 @@ import static org.codice.ddf.features.test.config.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.io.File;
+import java.net.URL;
+
 import javax.inject.Inject;
 import org.codice.ddf.features.test.FeatureInstallException;
 import org.codice.ddf.features.test.FeatureServiceWrapper;
@@ -41,8 +43,8 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 @ExamReactorStrategy(PerClass.class)
 public class ITKarafFeature {
 
-  private static final String KARAF_FEATURE_FILE =
-      ITKarafFeature.class.getResource(File.separator + "features.xml").getPath();
+  private static final URL KARAF_FEATURE_FILE =
+      ITKarafFeature.class.getResource(File.separator + "features.xml");
 
   @Configuration
   public Option[] examConfiguration() {
@@ -52,7 +54,7 @@ public class ITKarafFeature {
         defaultVmOptions(),
         defaultPortsOptions(),
         includeDependencyPropertiesFile(),
-        addFeaturesToFeatureRepo(KarafFeatureFile.featureFile(KARAF_FEATURE_FILE)),
+        addFeaturesToFeatureRepo(KarafFeatureFile.featureFile(KARAF_FEATURE_FILE.getPath())),
         addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }
 
