@@ -44,7 +44,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITSolrFeature {
 
   private static final URL SOLR_FEATURE_FILE =
-      ITSolrFeature.class.getResource(File.separator + "features.xml");
+      ITSolrFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

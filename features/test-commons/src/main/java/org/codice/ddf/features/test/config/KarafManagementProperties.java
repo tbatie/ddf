@@ -17,7 +17,12 @@ public class KarafManagementProperties {
 
   public static final String KARAF_MGMT_CFG_FILE_PATH = "etc/org.apache.karaf.management.cfg";
 
+  public static final String KARAF_SHELL_CFG_FILE_PATH  ="etc/org.apache.karaf.shell.cfg";
+
   public static final String RMI_REGISTRY_PORT_PROPERTY = "rmiRegistryPort";
 
   public static final String RMI_SERVER_PORT_PROPERTY = "rmiServerPort";
+
+  public static final String SSH_PORT_PROPERTY = "sshPort";
+
 }

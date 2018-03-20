@@ -44,7 +44,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITCamelFeature {
 
   private static final URL CAMEL_FEATURE_FILE =
-      ITCamelFeature.class.getResource(File.separator + "features.xml");
+      ITCamelFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

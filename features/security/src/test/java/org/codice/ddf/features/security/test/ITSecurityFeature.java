@@ -45,7 +45,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITSecurityFeature {
 
   private static final URL SECURITY_FEATURE =
-      ITSecurityFeature.class.getResource(File.separator + "features.xml");
+      ITSecurityFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

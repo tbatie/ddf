@@ -44,7 +44,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITKarafFeature {
 
   private static final URL KARAF_FEATURE_FILE =
-      ITKarafFeature.class.getResource(File.separator + "features.xml");
+      ITKarafFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

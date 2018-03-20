@@ -44,7 +44,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITAppsFeatureFile {
 
   private static final URL APPS_FEATURE_FILE =
-      ITAppsFeatureFile.class.getResource(File.separator + "features.xml");
+      ITAppsFeatureFile.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

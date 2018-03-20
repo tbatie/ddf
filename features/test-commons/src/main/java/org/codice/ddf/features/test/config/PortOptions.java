@@ -14,8 +14,10 @@
 package org.codice.ddf.features.test.config;
 
 import static org.codice.ddf.features.test.config.KarafManagementProperties.KARAF_MGMT_CFG_FILE_PATH;
+import static org.codice.ddf.features.test.config.KarafManagementProperties.KARAF_SHELL_CFG_FILE_PATH;
 import static org.codice.ddf.features.test.config.KarafManagementProperties.RMI_REGISTRY_PORT_PROPERTY;
 import static org.codice.ddf.features.test.config.KarafManagementProperties.RMI_SERVER_PORT_PROPERTY;
+import static org.codice.ddf.features.test.config.KarafManagementProperties.SSH_PORT_PROPERTY;
 
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
@@ -31,7 +33,8 @@ public class PortOptions {
         httpPort("9994"),
         ftpPort("9995"),
         rmiRegistryPort("20001"),
-        rmiServerPort("20002"));
+        rmiServerPort("20002"),
+        sshPort("8102"));
   }
 
   public static Option ddfHome(String path) {
@@ -64,7 +67,8 @@ public class PortOptions {
         KARAF_MGMT_CFG_FILE_PATH, RMI_SERVER_PORT_PROPERTY, port);
   }
 
-  public static Option debugPortOption(String port, boolean waitForDebug) {
-    return KarafDistributionOption.debugConfiguration(port, waitForDebug);
+  public static Option sshPort(String port) {
+    return KarafDistributionOption.editConfigurationFilePut(
+            KARAF_SHELL_CFG_FILE_PATH, SSH_PORT_PROPERTY, port);
   }
 }

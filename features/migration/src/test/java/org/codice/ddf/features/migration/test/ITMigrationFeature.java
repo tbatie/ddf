@@ -44,7 +44,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITMigrationFeature {
 
   private static final URL MIGRATION_FEATURE_FILE =
-      ITMigrationFeature.class.getResource(File.separator + "features.xml");
+      ITMigrationFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

@@ -43,7 +43,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITBrandingFeature {
 
   private static final URL BRANDING_FEATURE =
-      ITBrandingFeature.class.getResource(File.separator + "features.xml");
+      ITBrandingFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

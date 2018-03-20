@@ -45,7 +45,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITCxfFeature {
 
   private static final URL CXF_FEATURE_FILE =
-      ITCxfFeature.class.getResource(File.separator + "features.xml");
+      ITCxfFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

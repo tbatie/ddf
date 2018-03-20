@@ -44,7 +44,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITNotificationsFeature {
 
   private static final URL NOTIFICATIONS_FEATURE_FILE =
-      ITNotificationsFeature.class.getResource(File.separator + "features.xml");
+      ITNotificationsFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {

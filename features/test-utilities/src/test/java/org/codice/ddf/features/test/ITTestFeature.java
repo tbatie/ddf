@@ -40,7 +40,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 public class ITTestFeature {
 
   private static final URL TEST_FEATURE_FILE =
-      ITTestFeature.class.getResource(File.separator + "features.xml");
+      ITTestFeature.class.getResource("/features.xml");
 
   @Configuration
   public Option[] examConfiguration() {
@@ -59,10 +59,5 @@ public class ITTestFeature {
   @Test
   public void installHamcrestAll() throws FeatureUninstallException, FeatureInstallException {
     featuresService.installAndUninstallFeature(TestUtilitiesFeatureFile.hamcrestAll());
-  }
-
-  @Test
-  public void installLibsTestCommon() throws FeatureUninstallException, FeatureInstallException {
-    featuresService.installAndUninstallFeature(TestUtilitiesFeatureFile.libsTestCommon());
   }
 }

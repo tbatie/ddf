@@ -16,7 +16,6 @@
           xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
-
     <repository>mvn:org.apache.karaf.features/standard/${karaf.version}/xml/features</repository>
 
     <repository>mvn:org.apache.karaf.features/spring/${karaf.version}/xml/features</repository>
@@ -120,6 +119,7 @@
         <bundle dependency="true">mvn:io.netty/netty-resolver/${netty41-version}</bundle>
         <bundle dependency="true">mvn:io.netty/netty-transport-native-epoll/${netty41-version}
         </bundle>
+        <bundle>mvn:io.netty/netty-transport-native-kqueue/${netty.version}</bundle>
         <bundle>mvn:org.apache.camel/camel-amqp/${camel.version}</bundle>
     </feature>
 
