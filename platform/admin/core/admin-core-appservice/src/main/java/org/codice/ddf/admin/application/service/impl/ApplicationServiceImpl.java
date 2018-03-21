@@ -31,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.karaf.features.Feature;
@@ -79,11 +80,14 @@ public class ApplicationServiceImpl implements ApplicationService {
       return Collections.emptySet();
     }
 
+    Map<String, Bundle> bundlesByLocation = getBundlesByLocation();
     Set<Application> apps = new HashSet<>();
     for (File appDef : appDefinitions) {
       try {
-        Application app = Boon.fromJson(IOUtils.toString(appDef.toURI()), ApplicationImpl.class);
+        ApplicationImpl app =
+            Boon.fromJson(IOUtils.toString(appDef.toURI()), ApplicationImpl.class);
         if (isPermittedToViewFeature(app.getName())) {
+          app.loadBundles(bundlesByLocation);
           apps.add(app);
         }
 
@@ -176,5 +180,11 @@ public class ApplicationServiceImpl implements ApplicationService {
       LOGGER.warn("Failed to elevate subject", e);
       return false;
     }
+  }
+
+  private Map<String, Bundle> getBundlesByLocation() {
+    return Arrays.stream(
+            FrameworkUtil.getBundle(ApplicationServiceImpl.class).getBundleContext().getBundles())
+        .collect(Collectors.toMap(Bundle::getLocation, Function.identity()));
   }
 }
