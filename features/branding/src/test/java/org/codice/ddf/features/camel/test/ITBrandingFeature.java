@@ -21,10 +21,12 @@ import static org.codice.ddf.features.test.config.PortOptions.defaultPortsOption
 import static org.codice.ddf.features.test.config.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
-import java.io.File;
 import java.net.URL;
+import java.util.List;
 
 import javax.inject.Inject;
+
+import org.codice.ddf.features.test.FeatureFileUtils;
 import org.codice.ddf.features.test.FeatureInstallException;
 import org.codice.ddf.features.test.FeatureServiceWrapper;
 import org.codice.ddf.features.test.FeatureUninstallException;
@@ -32,39 +34,45 @@ import org.codice.ddf.features.test.features.BrandingFeatureFile;
 import org.codice.ddf.features.test.features.TestUtilitiesFeatureFile;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 import org.ops4j.pax.exam.Configuration;
 import org.ops4j.pax.exam.Option;
-import org.ops4j.pax.exam.junit.PaxExam;
+import org.ops4j.pax.exam.junit.PaxExamParameterized;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
-@RunWith(PaxExam.class)
+@RunWith(PaxExamParameterized.class)
 @ExamReactorStrategy(PerClass.class)
 public class ITBrandingFeature {
 
-  private static final URL BRANDING_FEATURE =
-      ITBrandingFeature.class.getResource("/features.xml");
+  private static final URL BRANDING_FEATURE = ITBrandingFeature.class.getResource("/features.xml");
 
   @Configuration
-  public Option[] examConfiguration() {
+  public static Option[] examConfiguration() {
     return options(
-        kernelDistributionOption(),
-        includeDependencyPropertiesFile(),
-        defaultVmOptions(),
-        defaultPortsOptions(),
-        addFeaturesToFeatureRepo(BrandingFeatureFile.featureFile(BRANDING_FEATURE.getPath())),
-        addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
+            kernelDistributionOption(),
+            includeDependencyPropertiesFile(),
+            defaultVmOptions(),
+            defaultPortsOptions(),
+            addFeaturesToFeatureRepo(BrandingFeatureFile.featureFile(BRANDING_FEATURE.getPath())),
+            addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
+  }
+
+  @Parameterized.Parameters(name = "feature: {0}")
+  public static List<Object[]> getParameters() {
+    return FeatureFileUtils.featureFileToFeatureParameters(BRANDING_FEATURE.getPath());
   }
 
   @Inject FeatureServiceWrapper featuresService;
 
-  @Test
-  public void installBrandingApi() throws FeatureUninstallException, FeatureInstallException {
-    featuresService.installAndUninstallFeature(BrandingFeatureFile.brandingApi());
+  private String featureName;
+
+  public ITBrandingFeature(String featureName) {
+    this.featureName = featureName;
   }
 
   @Test
-  public void installDdfBranding() throws FeatureUninstallException, FeatureInstallException {
-    featuresService.installAndUninstallFeature(BrandingFeatureFile.ddfBranding());
+  public void installAndUninstallFeature() throws FeatureInstallException, FeatureUninstallException {
+    featuresService.installAndUninstallFeature(featureName);
   }
 }

@@ -17,8 +17,14 @@ public interface FeatureServiceWrapper {
 
   void installFeature(Feature feature) throws FeatureInstallException;
 
+  void installFeature(String feature) throws FeatureInstallException;
+
+
   void uninstallFeature(Feature feature) throws FeatureUninstallException;
 
   void installAndUninstallFeature(Feature feature)
       throws FeatureInstallException, FeatureUninstallException;
+
+  void installAndUninstallFeature(String feature)
+          throws FeatureUninstallException, FeatureInstallException;
 }

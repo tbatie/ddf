@@ -29,11 +29,35 @@ public class FeatureServiceWrapperImpl implements FeatureServiceWrapper {
     uninstallFeature(feature);
   }
 
+  @Override
+  public void installAndUninstallFeature(String feature)
+          throws FeatureUninstallException, FeatureInstallException {
+    installFeature(feature);
+    uninstallFeature(feature);
+  }
+
   public void installFeature(Feature feature) throws FeatureInstallException {
     try {
       featuresService.installFeature(feature.featureName());
     } catch (Exception e) {
       throw new FeatureInstallException(e);
+    }
+  }
+
+  @Override
+  public void installFeature(String feature) throws FeatureInstallException {
+    try {
+      featuresService.installFeature(feature);
+    } catch (Exception e) {
+      throw new FeatureInstallException(e);
+    }
+  }
+
+  public void uninstallFeature(String feature) throws FeatureUninstallException {
+    try {
+      featuresService.uninstallFeature(feature);
+    } catch (Exception e) {
+      throw new FeatureUninstallException(e);
     }
   }
 
