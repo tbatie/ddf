@@ -13,6 +13,8 @@
  */
 package org.codice.ddf.features.camel.test;
 
+import static org.codice.ddf.features.test.config.DebugOptions.defaultDebuggingOptions;
+import static org.codice.ddf.features.test.config.DebugOptions.enableRemoteDebugging;
 import static org.codice.ddf.features.test.config.DistributionOptions.includeDependencyPropertiesFile;
 import static org.codice.ddf.features.test.config.DistributionOptions.kernelDistributionOption;
 import static org.codice.ddf.features.test.config.FeatureOptions.addBootFeatureOption;
@@ -45,7 +47,7 @@ import org.ops4j.pax.exam.spi.reactors.PerClass;
 @ExamReactorStrategy(PerClass.class)
 public class ITBrandingFeature {
 
-  private static final URL BRANDING_FEATURE = ITBrandingFeature.class.getResource("/features.xml");
+  private static final URL BRANDING_FEATURE_PATH = ITBrandingFeature.class.getResource("/features.xml");
 
   @Configuration
   public static Option[] examConfiguration() {
@@ -53,14 +55,15 @@ public class ITBrandingFeature {
             kernelDistributionOption(),
             includeDependencyPropertiesFile(),
             defaultVmOptions(),
+            defaultDebuggingOptions(),
             defaultPortsOptions(),
-            addFeaturesToFeatureRepo(BrandingFeatureFile.featureFile(BRANDING_FEATURE.getPath())),
+            addFeaturesToFeatureRepo(BrandingFeatureFile.featureFile(BRANDING_FEATURE_PATH)),
             addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }
 
   @Parameterized.Parameters(name = "feature: {0}")
   public static List<Object[]> getParameters() {
-    return FeatureFileUtils.featureFileToFeatureParameters(BRANDING_FEATURE.getPath());
+    return FeatureFileUtils.featureFileToFeatureParameters(BRANDING_FEATURE_PATH);
   }
 
   @Inject FeatureServiceWrapper featuresService;

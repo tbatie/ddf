@@ -3,7 +3,10 @@ package org.codice.ddf.features.test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.net.URI;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +42,13 @@ public class FeatureFileUtils {
     } catch (FileNotFoundException e) {
       throw new RuntimeException("Feature file not found: " + featureFile.getAbsolutePath(), e);
     }
+  }
+
+  public static List<Object[]> featureFileToFeatureParameters(URL featureFile) {
+    return getFeaturesFromFeaturesFile(Paths.get(featureFile.getPath()).toAbsolutePath().toString())
+            .stream()
+            .map(feat -> new Object[] {feat})
+            .collect(Collectors.toList());
   }
 
   public static List<Object[]> featureFileToFeatureParameters(String featureFile) {

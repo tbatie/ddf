@@ -15,6 +15,10 @@ package org.codice.ddf.features.test.features;
 
 import static org.ops4j.pax.exam.CoreOptions.maven;
 
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import org.codice.ddf.features.test.DependencyVersionResolver;
 import org.codice.ddf.features.test.Feature;
 import org.codice.ddf.features.test.FeatureFile;
@@ -44,6 +48,10 @@ public class BrandingFeatureFile implements FeatureFile {
 
   public static FeatureFile featureFile(String filePath) {
     return new BrandingFeatureFile(filePath);
+  }
+
+  public static FeatureFile featureFile(URL filePath) {
+    return new BrandingFeatureFile(Paths.get(filePath.getPath()).toAbsolutePath().toString());
   }
 
   @Override
