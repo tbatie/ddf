@@ -24,6 +24,7 @@ public class VmOptions {
     return new DefaultCompositeOption(
         vmOption("-Xmx4096M"),
         vmOption("-Xms2048M"),
+
         // avoid integration tests stealing focus on OS X
         vmOption("-Djava.awt.headless=true"),
         vmOption("-Dfile.encoding=UTF8"));

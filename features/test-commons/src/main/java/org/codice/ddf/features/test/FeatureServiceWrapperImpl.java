@@ -14,8 +14,13 @@
 package org.codice.ddf.features.test;
 
 import org.apache.karaf.features.FeaturesService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FeatureServiceWrapperImpl implements FeatureServiceWrapper {
+
+  private static final Logger LOGGER =
+          LoggerFactory.getLogger(FeatureServiceWrapperImpl.class);
 
   private FeaturesService featuresService;
 
@@ -37,16 +42,14 @@ public class FeatureServiceWrapperImpl implements FeatureServiceWrapper {
   }
 
   public void installFeature(Feature feature) throws FeatureInstallException {
-    try {
-      featuresService.installFeature(feature.featureName());
-    } catch (Exception e) {
-      throw new FeatureInstallException(e);
-    }
+    installFeature(feature.featureName());
   }
 
   @Override
   public void installFeature(String feature) throws FeatureInstallException {
     try {
+      System.out.println("Installing feature::::: " + feature);
+      LOGGER.info("Installing feature: " + feature);
       featuresService.installFeature(feature);
     } catch (Exception e) {
       throw new FeatureInstallException(e);
@@ -55,6 +58,7 @@ public class FeatureServiceWrapperImpl implements FeatureServiceWrapper {
 
   public void uninstallFeature(String feature) throws FeatureUninstallException {
     try {
+      LOGGER.info("Uninstalling feature: " + feature);
       featuresService.uninstallFeature(feature);
     } catch (Exception e) {
       throw new FeatureUninstallException(e);
@@ -62,10 +66,6 @@ public class FeatureServiceWrapperImpl implements FeatureServiceWrapper {
   }
 
   public void uninstallFeature(Feature feature) throws FeatureUninstallException {
-    try {
-      featuresService.uninstallFeature(feature.featureName());
-    } catch (Exception e) {
-      throw new FeatureUninstallException(e);
-    }
+    uninstallFeature(feature.featureName());
   }
 }

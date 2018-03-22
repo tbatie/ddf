@@ -11,10 +11,9 @@
  * License is distributed along with this program and can be found at
  * <http://www.gnu.org/licenses/lgpl.html>.
  */
-package org.codice.ddf.features.camel.test;
+package org.codice.ddf.features.branding.test;
 
 import static org.codice.ddf.features.test.config.DebugOptions.defaultDebuggingOptions;
-import static org.codice.ddf.features.test.config.DebugOptions.enableRemoteDebugging;
 import static org.codice.ddf.features.test.config.DistributionOptions.includeDependencyPropertiesFile;
 import static org.codice.ddf.features.test.config.DistributionOptions.kernelDistributionOption;
 import static org.codice.ddf.features.test.config.FeatureOptions.addBootFeatureOption;
@@ -23,11 +22,15 @@ import static org.codice.ddf.features.test.config.PortOptions.defaultPortsOption
 import static org.codice.ddf.features.test.config.VmOptions.defaultVmOptions;
 import static org.ops4j.pax.exam.CoreOptions.options;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.commons.io.IOUtils;
 import org.codice.ddf.features.test.FeatureFileUtils;
 import org.codice.ddf.features.test.FeatureInstallException;
 import org.codice.ddf.features.test.FeatureServiceWrapper;
@@ -57,13 +60,17 @@ public class ITBrandingFeature {
             defaultVmOptions(),
             defaultDebuggingOptions(),
             defaultPortsOptions(),
-            addFeaturesToFeatureRepo(BrandingFeatureFile.featureFile(BRANDING_FEATURE_PATH)),
+            addFeaturesToFeatureRepo(BrandingFeatureFile.featureFile(BRANDING_FEATURE_PATH.getPath())),
             addBootFeatureOption(TestUtilitiesFeatureFile.featureTestingUtils()));
   }
 
   @Parameterized.Parameters(name = "feature: {0}")
   public static List<Object[]> getParameters() {
-    return FeatureFileUtils.featureFileToFeatureParameters(BRANDING_FEATURE_PATH);
+//    return Arrays.asList(new Object[][]{
+//            {"branding-api"},
+//            {"ddf-branding"}
+//    });
+    return FeatureFileUtils.featureFileToFeatureParameters(getFeatureFile());
   }
 
   @Inject FeatureServiceWrapper featuresService;
@@ -73,6 +80,14 @@ public class ITBrandingFeature {
   public ITBrandingFeature(String featureName) {
     this.featureName = featureName;
   }
+
+  public static String getFeatureFile() {
+    try {
+      return IOUtils.toString(BRANDING_FEATURE_PATH, Charset.defaultCharset());
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+   }
 
   @Test
   public void installAndUninstallFeature() throws FeatureInstallException, FeatureUninstallException {

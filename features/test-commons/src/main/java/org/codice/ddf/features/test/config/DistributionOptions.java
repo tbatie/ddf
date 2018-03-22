@@ -13,29 +13,38 @@
  */
 package org.codice.ddf.features.test.config;
 
+import static org.codice.ddf.features.test.config.SystemProperties.SYSTEM_PROPERTIES_FILE_PATH;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 
+import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import org.codice.ddf.features.test.DependencyVersionResolver;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
+import org.ops4j.pax.exam.options.DefaultCompositeOption;
 
 public class DistributionOptions {
 
   public static final Path DEPENDENCY_PROPERTIES_PATH =
       Paths.get("target", "classes", "META-INF", "maven", "dependencies.properties");
 
+  public static final String TEST_DIR_SYS_PROP = "test.class.dir";
+  public static final Path TEST_CLASSES_DIR = Paths.get("target", "test-classes").toAbsolutePath();
+
   public static Option kernelDistributionOption() {
-    return KarafDistributionOption.karafDistributionConfiguration()
-        .frameworkUrl(
-            maven()
-                .groupId("org.codice.ddf")
-                .artifactId("kernel")
-                .version(DependencyVersionResolver.resolver())
-                .type("zip"))
-        .unpackDirectory(Paths.get("target", "exam").toFile())
-        .useDeployFolder(false);
+    return new DefaultCompositeOption(
+        KarafDistributionOption.karafDistributionConfiguration()
+            .frameworkUrl(
+                maven()
+                    .groupId("org.codice.ddf")
+                    .artifactId("kernel")
+                    .version(DependencyVersionResolver.resolver())
+                    .type("zip"))
+            .unpackDirectory(Paths.get("target", "exam").toFile())
+            .useDeployFolder(false),
+        KarafDistributionOption.editConfigurationFileExtend(SYSTEM_PROPERTIES_FILE_PATH, TEST_DIR_SYS_PROP, TEST_CLASSES_DIR.toString()));
   }
 
   /**

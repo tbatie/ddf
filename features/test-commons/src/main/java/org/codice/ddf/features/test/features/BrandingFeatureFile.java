@@ -50,10 +50,6 @@ public class BrandingFeatureFile implements FeatureFile {
     return new BrandingFeatureFile(filePath);
   }
 
-  public static FeatureFile featureFile(URL filePath) {
-    return new BrandingFeatureFile(Paths.get(filePath.getPath()).toAbsolutePath().toString());
-  }
-
   @Override
   public UrlReference getFeatureFileUrl() {
     return featureUrl;
