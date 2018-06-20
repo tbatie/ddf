@@ -41,6 +41,7 @@
         <module>utilities</module>
         <module>apps</module>
         <module>install-profiles</module>
+        <module>config</module>
     </modules>
 
     <properties>

@@ -1,0 +1,8 @@
+protocol: HTTPS
+httpsPort: 8993
+httpPort: 8181
+hostname: localhost
+siteName: example_sitename
+siteContact: example_sitecontact
+systemVersion: example_system_version
+organization: example_organization
