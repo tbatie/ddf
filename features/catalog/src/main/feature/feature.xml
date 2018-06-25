@@ -11,25 +11,21 @@
  *
  **/
  -->
-
-<!--
-     NOTE: This features XML file uses the Karaf "install" attribute to specify whether a feature
-     is automatically installed when an app's KAR file is hot deployed.
-
-     Description of the install attribute from the Karaf features XSD:
-
-     "Installation mode. Can be either manual or auto. Specifies whether the feature should be
-     automatically installed when dropped inside the deploy folder. Note: This attribute doesn't
-     affect feature descriptors that are installed from the command line or as part of the
-     org.apache.karaf.features.cfg."
--->
-<features name="${project.artifactId}-${project.version}"
+<features xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          name="${project.artifactId}-${project.version}"
           xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
+
+    <repository>mvn:ddf.features/camel/${project.version}/xml/features</repository>
+    <repository>mvn:ddf.features/cxf/${project.version}/xml/features</repository>
+    <repository>mvn:ddf.features/kernel/${project.version}/xml/features</repository>
+    <repository>mvn:ddf.features/utilities/${project.version}/xml/features</repository>
+    <repository>mvn:ddf.features/security/${project.version}/xml/features</repository>
+
 
     <feature name="catalog-core-api" version="${project.version}"
              description="Catalog API interfaces and simple implementations.">
+        <feature>action-core-api</feature>
         <bundle>mvn:ddf.platform.api/platform-api/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-api/${project.version}</bundle>
         <bundle>mvn:ddf.mime.core/mime-core-api/${project.version}</bundle>
@@ -42,17 +38,27 @@
     <feature name="catalog-core" version="${project.version}"
              description="Catalog Core feature containing the API, third party bundles necessary to run ddf-core.">
         <feature>catalog-core-api</feature>
+        <feature>spring</feature>
+        <feature>common-system</feature>
+        <feature>action-core-impl</feature>
+        <bundle>mvn:joda-time/joda-time/2.9.4</bundle>
+        <feature>security-core-api</feature>
+        <bundle>mvn:org.apache.geronimo.specs/geronimo-jms_1.1_spec/1.1.1</bundle>
+        <feature>security-handler-api</feature>
+        <feature>util-uuidgenerator-api</feature>
+        <feature>mime-core</feature>
+        <feature>util-uuidgenerator</feature>
+        <feature>security-core</feature>
         <feature version="${cxf.version}">cxf-jaxrs</feature>
 
         <bundle>mvn:ddf.catalog.core/catalog-core-commons/${project.version}</bundle>
         <bundle>mvn:ddf.measure/measure-api/${project.version}</bundle>
-        <bundle>mvn:org.codice.thirdparty/picocontainer/1.3_1</bundle>
+        <bundle>mvn:org.codice.thirdparty/picocontainer/1.2_1</bundle>
+        <bundle>mvn:org.codice.thirdparty/vecmath/1.3.2_1</bundle>
         <!-- for GeoTools -->
         <bundle>mvn:org.codice.thirdparty/geotools-suite/${org.geotools.bundle.version}</bundle>
         <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
-        <bundle>
-            mvn:commons-collections/commons-collections/${commons-collections.version}
-        </bundle>
+        <bundle>mvn:commons-collections/commons-collections/${commons-collections.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-federationstrategy/${project.version}</bundle>
         <bundle>mvn:org.codice.thirdparty/lucene-core/3.0.2_1</bundle>
         <feature>jodah-failsafe</feature>
@@ -70,6 +76,7 @@
         <feature>slf4j</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-standardframework/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.security/catalog-security-logging/${project.version}</bundle>
+
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-attribute/${project.version}
         </bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-defaultvalues/${project.version}</bundle>
@@ -77,12 +84,16 @@
     </feature>
 
     <feature name="catalog-core-attachment" version="${project.version}" description="Generate Filenames for Ingested Attachments">
-        <feature>catalog-core-api</feature>
+        <feature>mime-core</feature>
+        <bundle>mvn:ddf.catalog.core/catalog-core-attachment/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-attachment-impl/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-core-plugins" version="${project.version}"
              description="Catalog core plugins">
+        <feature>catalog-core</feature>
+        <feature>camel-core</feature>
+        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-resourcesizeplugin/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-resourcestatusplugin/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-tagsfilterplugin/${project.version}</bundle>
@@ -95,6 +106,11 @@
 
     <feature name="catalog-core-content" version="${project.version}"
              description="Core features for content">
+        <feature>action-core-impl</feature>
+        <feature>catalog-core</feature>
+        <feature>apache-commons</feature>
+        <feature>spring</feature>
+        <feature>common-system</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-contentresourcereader/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf/checksum/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-checksum/${project.version}</bundle>
@@ -105,47 +121,68 @@
     <feature name="catalog-core-directorymonitor" version="${project.version}"
              description="Monitors directories to process content files.">
         <feature>apache-commons</feature>
+        <feature>action-core-api</feature>
+        <feature>security-core-api</feature>
+        <feature>security-expansion</feature>
+        <feature>javax-validation</feature>
+        <feature>camel-core</feature>
+        <feature>cxf-frontend-javascript</feature>
+        <feature>cxf-jaxrs</feature>
+        <feature>security-handler-api</feature>
+        <feature>camel-blueprint</feature>
+        <feature>catalog-core</feature>
+
         <bundle>mvn:ddf.catalog.core/catalog-core-camelcontext/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-directorymonitor/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-core-downloadaction" version="${project.version}"
              description="Catalog Core feature to download resources asynchronously.">
+        <feature>action-core-impl</feature>
+        <feature>catalog-core</feature>
+        <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr339-api-2.0.1/2.6.0</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-downloadaction/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-metrics" version="${project.version}">
+        <feature>spring</feature>
+        <feature>common-system</feature>
+        <feature>apache-commons</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-metricsplugin/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-sourcemetricsplugin/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-core-backupplugin" version="${project.version}"
              description="Catalog post ingest plug-in to backup metacards to a file system.">
-        <feature>catalog-app</feature>
+        <feature>jodah-failsafe</feature>
+        <feature>apache-commons</feature>
+        <feature>common-system</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-backupplugin/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-plugin-expirationdate" version="${project.version}"
              description="Catalog pre-ingest plugin to set an expiration date on metacards.">
-        <feature>catalog-core</feature>
+        <feature>joda-converter</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-expirationdate/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-schematron-plugin" version="${project.version}"
              description="Schematron pre-ingest validation plugin.">
+        <feature>apache-commons</feature>
+        <feature>wss4j</feature>
+        <feature>common-system</feature>
+        <feature>spring</feature>
         <bundle>mvn:ddf.catalog.schematron/catalog-schematron-plugin/${project.version}</bundle>
-    </feature>
-
-    <feature name="catalog-rest" version="${project.version}">
-        <feature>catalog-rest-endpoint</feature>
-        <feature>catalog-opensearch-endpoint</feature>
-        <feature>catalog-opensearch-source</feature>
     </feature>
 
     <feature name="catalog-rest-endpoint" version="${project.version}"
              description="REST Endpoint provides CRUD operations on the Catalog Framework.">
-        <bundle>mvn:ddf.catalog.rest/catalog-rest-service/${project.version}</bundle>
-        <bundle>mvn:ddf.catalog.rest/catalog-rest-impl/${project.version}</bundle>
+        <feature>catalog-core</feature>
+        <feature>catalog-core-attachment</feature>
+        <feature>mime-tika-resolver</feature>
+        <feature>action-core-impl</feature>
+        <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr339-api-2.0.1/2.6.0</bundle>
         <bundle>mvn:ddf.catalog.rest/catalog-rest-endpoint/${project.version}</bundle>
     </feature>
 
@@ -193,7 +230,6 @@
 
     <feature name="catalog-plugin-federationreplication"
              version="${project.version}" description="">
-        <feature>catalog-app</feature>
         <bundle>mvn:ddf.catalog.plugin/plugin-federation-replication/${project.version}</bundle>
     </feature>
 
@@ -406,7 +442,6 @@
     </feature>
 
     <feature name="catalog-validator-metacardwkt" version="${project.version}" description="Provides support for WKT validation">
-        <feature>catalog-core</feature>
         <bundle>mvn:org.codice.ddf.validator/catalog-validator-wkt/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf.validator/catalog-validator-metacardwkt/${project.version}</bundle>
     </feature>
@@ -414,28 +449,21 @@
     <feature name="catalog-validator-metacardduplication"
              version="${project.version}"
              description="Metacard Duplicate Validator">
-        <feature>catalog-core</feature>
-        <bundle>
-            mvn:org.codice.ddf.validator/catalog-validator-metacardduplication/${project.version}
-        </bundle>
+        <bundle>mvn:org.codice.ddf.validator/catalog-validator-metacardduplication/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-validator-metacardlocation"
              version="${project.version}"
              description="Metacard Location Validator">
         <feature>catalog-validator-metacardwkt</feature>
-        <bundle>
-            mvn:org.codice.ddf.validator/catalog-validator-metacardlocation/${project.version}
-        </bundle>
+        <bundle>mvn:org.codice.ddf.validator/catalog-validator-metacardlocation/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-validator-metacardframecenter"
              version="${project.version}"
              description="Metacard Frame Center Validator">
         <feature>catalog-validator-metacardwkt</feature>
-        <bundle>
-            mvn:org.codice.ddf.validator/catalog-validator-metacardframecenter/${project.version}
-        </bundle>
+        <bundle>mvn:org.codice.ddf.validator/catalog-validator-metacardframecenter/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-overlay" version="${project.version}"
@@ -450,107 +478,43 @@
 
     <feature name="catalog-client-info" version="${project.version}"
              description="Places client-specific information from the servlet API into request and response properties">
-        <feature>catalog-core-api</feature>
-        <feature>clientinfo-filter</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-clientinfo/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-metacardingest-network" version="${project.version}"
              description="Conditional attribute enhancement to metacards during ingest using client network information">
-        <feature>catalog-core-api</feature>
-        <feature>clientinfo-filter</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardingest-network/${project.version}
         </bundle>
     </feature>
 
     <feature name="catalog-metacard-backup-storage-api" version="${project.version}"
              description="API for the metacard backup storage">
-        <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-storage-api/${project.version}
-        </bundle>
+        <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-storage-api/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-metacard-backup-filestorage" version="${project.version}"
              description="File system storage for metacard backup">
-        <feature>catalog-core</feature>
-        <feature>catalog-metacard-backup-storage-api</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-filestorage/${project.version}
         </bundle>
     </feature>
 
     <feature name="catalog-metacard-backup-s3storage" version="${project.version}"
              description="S3 storage for metacard backup">
-        <feature>catalog-core</feature>
-        <feature>catalog-metacard-backup-storage-api</feature>
-        <feature>camel-aws</feature>
-        <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-s3storage/${project.version}
-        </bundle>
+        <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-s3storage/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-ftp" version="${project.version}"
              description="FTP endpoint for ingesting files into the catalog. Supports PUT and MPUT operations only. Avoids the extra IO overhead of otherwise having to temporarily write the file to the file system.">
-        <feature>catalog-app</feature>
         <bundle>mvn:ddf.catalog/ftp/${project.version}</bundle>
         <bundle>mvn:org.apache.mina/mina-core/${mina.version}</bundle>
     </feature>
 
     <feature name="catalog-async-inmemory" version="${project.version}">
-        <feature>catalog-app</feature>
         <bundle>mvn:ddf.catalog.async/catalog-async-data-api/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-plugin-api/${project.version}</bundle>
-        <bundle>mvn:ddf.catalog.async/catalog-async-processingframework-api/${project.version}
-        </bundle>
+        <bundle>mvn:ddf.catalog.async/catalog-async-processingframework-api/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-postingestplugin/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-processingframework/${project.version}</bundle>
     </feature>
 
-    <feature name="catalog-app" version="${project.version}"
-             description="The Catalog provides a framework for storing, searching, processing, and transforming information.\nClients typically perform query, create, read, update, and delete (QCRUD) operations against the Catalog.\nAt the core of the Catalog functionality is the Catalog Framework, which routes all requests and responses through the system, invoking additional processing per the system configuration.">
-        <feature>catalog-core-api</feature>
-        <feature>catalog-core</feature>
-        <feature>catalog-core-plugins</feature>
-        <feature>catalog-core-content</feature>
-        <feature>catalog-core-directorymonitor</feature>
-        <feature>catalog-core-downloadaction</feature>
-        <feature>catalog-metrics</feature>
-        <feature>catalog-schematron-plugin</feature>
-        <feature>catalog-rest</feature>
-        <feature>catalog-confluence-source</feature>
-        <feature>catalog-plugin-jpeg2000</feature>
-        <feature>catalog-transformer-metadata</feature>
-        <feature>catalog-transformer-xsltengine</feature>
-        <feature>catalog-transformer-resource</feature>
-        <feature>catalog-transformer-tika</feature>
-        <feature>catalog-transformer-video</feature>
-        <feature>catalog-transformer-json</feature>
-        <feature>catalog-transformer-atom</feature>
-        <feature>catalog-transformer-csv</feature>
-        <feature>catalog-transformer-xml</feature>
-        <feature>catalog-transformer-zip</feature>
-        <feature>catalog-security-filter</feature>
-        <feature>catalog-security-operationplugin</feature>
-        <feature>catalog-security-plugin</feature>
-        <feature>catalog-security-resourceplugin</feature>
-        <feature>catalog-security-policyplugin</feature>
-        <feature>catalog-security-pointofcontact-readonly</feature>
-        <feature>catalog-security-metacardattributeplugin</feature>
-        <feature>catalog-security-xmlattributeplugin</feature>
-        <feature>catalog-plugin-security-audit</feature>
-        <feature>catalog-admin-module-sources</feature>
-        <feature>catalog-admin-module-maplayers</feature>
-        <feature>catalog-admin-module-layout</feature>
-        <feature>catalog-core-validationparser</feature>
-        <feature>catalog-transformer-pdf</feature>
-        <feature>catalog-transformer-pptx</feature>
-        <feature>catalog-validator-metacardwkt</feature>
-        <feature>catalog-validator-metacardduplication</feature>
-        <feature>catalog-validator-metacardlocation</feature>
-        <feature>catalog-validator-metacardframecenter</feature>
-        <feature>catalog-transformer-overlay</feature>
-        <feature>catalog-transformer-preview</feature>
-        <feature>catalog-client-info</feature>
-        <feature>catalog-transformer-geoformatter</feature>
-        <feature>catalog-transformer-thumbnail</feature>
-        <feature>catalog-metacardingest-network</feature>
-        <feature>catalog-core-attachment</feature>
-    </feature>
 </features>
