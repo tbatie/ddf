@@ -41,7 +41,7 @@
         </service-properties>
     </service>
 
-    <reference id="resourceActionProvider" interface="ddf.action.ActionProvider" filter="(id=catalog.data.metacard.resource)"/>
+    <reference id="resourceActionProvider" interface="ddf.action.ActionProvider" filter="(id=catalog.data.metacard.resource)" availability="optional"/>
 
     <service interface="ddf.action.MultiActionProvider" >
         <service-properties>

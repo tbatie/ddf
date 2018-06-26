@@ -51,6 +51,10 @@ public class DerivedContentActionProvider implements MultiActionProvider {
 
   @Override
   public <T> List<Action> getActions(T input) {
+    if(resourceActionProvider == null) {
+      return Collections.emptyList();
+    }
+
     Action resourceAction = resourceActionProvider.getAction(input);
     if (resourceAction == null) {
       return Collections.emptyList();

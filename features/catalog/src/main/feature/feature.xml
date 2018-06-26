@@ -158,12 +158,15 @@
         <feature>jodah-failsafe</feature>
         <feature>apache-commons</feature>
         <feature>common-system</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-backupplugin/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-plugin-expirationdate" version="${project.version}"
              description="Catalog pre-ingest plugin to set an expiration date on metacards.">
         <feature>joda-converter</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-expirationdate/${project.version}</bundle>
     </feature>
 
@@ -173,6 +176,8 @@
         <feature>wss4j</feature>
         <feature>common-system</feature>
         <feature>spring</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.schematron/catalog-schematron-plugin/${project.version}</bundle>
     </feature>
 
@@ -190,6 +195,12 @@
              description="OpenSearch Query Endpoint with Atom Transformer.">
         <bundle>mvn:ddf.catalog.opensearch/catalog-opensearch-endpoint/${project.version}</bundle>
         <feature>abdera</feature>
+        <feature>cxf-specs</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
+        <feature>catalog-core</feature>
+        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+
         <bundle>mvn:org.apache.abdera/abdera-extensions-opensearch/${abdera.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-server/${abdera.version}</bundle>
     </feature>
@@ -198,6 +209,12 @@
              description="OpenSearch Federated Source queries a Federated Source using OpenSearch.">
         <feature>abdera</feature>
         <feature>cxf-rs-security-sso-saml</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
+        <feature>catalog-core</feature>
+        <feature>catalog-transformer-geoformatter</feature>
+        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+
         <bundle>mvn:org.apache.abdera/abdera-server/${abdera.version}</bundle>
         <bundle>mvn:ddf.catalog.opensearch/catalog-opensearch-source/${project.version}</bundle>
     </feature>
@@ -205,6 +222,7 @@
     <feature name="catalog-confluence-source" version="${project.version}"
              description="Confluence source and transformer">
         <feature version="${cxf.version}">cxf-jaxrs</feature>
+        <feature>action-core-api</feature>
         <bundle>mvn:ddf.catalog.confluence/catalog-confluence-source/${project.version}</bundle>
         <bundle>mvn:io.fastjson/boon/${boon.version}</bundle>
     </feature>
@@ -230,16 +248,19 @@
 
     <feature name="catalog-plugin-federationreplication"
              version="${project.version}" description="">
+        <feature>action-core-api</feature>
         <bundle>mvn:ddf.catalog.plugin/plugin-federation-replication/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-plugin-jpeg2000" version="${project.version}"
              description="">
+        <feature>action-core-api</feature>
         <bundle>mvn:ddf.catalog.plugin/jpeg2000-thumbnail-converter/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-metadata" version="${project.version}"
              description="Retrieves the attribute, Metadata, from the Metacard.">
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-metadata/${project.version}</bundle>
     </feature>
 
@@ -252,16 +273,19 @@
     <feature name="catalog-transformer-xsltengine" version="${project.version}"
              description="Provides XSLT transformer engine.">
         <feature>pax-swissbox</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.transformer/service-xslt-transformer/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-resource" version="${project.version}"
              description="Resource MetacardTransformer and InputTransformer">
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-resource/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-tika" version="${project.version}"
              description="Default Input Transformer.">
+        <feature>action-core-api</feature>
         <bundle>mvn:ddf.catalog.transformer/tika-input-transformer/${project.version}</bundle>
     </feature>
 
@@ -494,12 +518,19 @@
 
     <feature name="catalog-metacard-backup-filestorage" version="${project.version}"
              description="File system storage for metacard backup">
+        <feature>catalog-core-api</feature>
+        <feature>camel-core</feature>
+        <feature>common-system</feature>
+        <feature>cxf-frontend-javascript</feature>
+        <feature>spring</feature>
+        <feature>camel-blueprint</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-filestorage/${project.version}
         </bundle>
     </feature>
 
     <feature name="catalog-metacard-backup-s3storage" version="${project.version}"
              description="S3 storage for metacard backup">
+        <feature>camel-aws</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-s3storage/${project.version}</bundle>
     </feature>
 
