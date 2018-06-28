@@ -16,6 +16,7 @@
           xmlns="http://karaf.apache.org/xmlns/features/v1.3.0"
           xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0 http://karaf.apache.org/xmlns/features/v1.3.0">
 
+    <repository>mvn:ddf.features/admin/${project.version}/xml/features</repository>
     <repository>mvn:ddf.features/camel/${project.version}/xml/features</repository>
     <repository>mvn:ddf.features/cxf/${project.version}/xml/features</repository>
     <repository>mvn:ddf.features/kernel/${project.version}/xml/features</repository>
@@ -200,7 +201,6 @@
         <feature>catalog-core-api</feature>
         <feature>catalog-core</feature>
         <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
-
         <bundle>mvn:org.apache.abdera/abdera-extensions-opensearch/${abdera.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-server/${abdera.version}</bundle>
     </feature>
@@ -223,12 +223,15 @@
              description="Confluence source and transformer">
         <feature version="${cxf.version}">cxf-jaxrs</feature>
         <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
+        <feature>security-core-api</feature>
         <bundle>mvn:ddf.catalog.confluence/catalog-confluence-source/${project.version}</bundle>
         <bundle>mvn:io.fastjson/boon/${boon.version}</bundle>
     </feature>
 
     <feature name="abdera" version="${project.version}"
              description="Apache Abdera">
+        <feature>cxf-specs</feature>
         <bundle>wrap:mvn:org.apache.james/apache-mime4j-core/0.7.2</bundle>
         <bundle>mvn:commons-codec/commons-codec/1.4</bundle>
         <!-- This bundle <bundle>mvn:org.apache.ws.commons.axiom/axiom-impl/1.2.10</bundle>
@@ -249,12 +252,16 @@
     <feature name="catalog-plugin-federationreplication"
              version="${project.version}" description="">
         <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
+        <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr339-api-2.0.1/2.6.0</bundle>
         <bundle>mvn:ddf.catalog.plugin/plugin-federation-replication/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-plugin-jpeg2000" version="${project.version}"
              description="">
         <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
+        <feature>apache-commons</feature>
         <bundle>mvn:ddf.catalog.plugin/jpeg2000-thumbnail-converter/${project.version}</bundle>
     </feature>
 
@@ -266,6 +273,8 @@
 
     <feature name="catalog-transformer-thumbnail" version="${project.version}"
              description="Retrieves the attribute, Thumbnail, from the Metacard.">
+        <feature>catalog-core-api</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-thumbnail/${project.version}
         </bundle>
     </feature>
@@ -279,23 +288,34 @@
 
     <feature name="catalog-transformer-resource" version="${project.version}"
              description="Resource MetacardTransformer and InputTransformer">
-        <feature>catalog-core-api</feature>
+        <feature>catalog-core</feature>
+        <feature>common-system</feature>
+        <feature>spring</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-resource/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-tika" version="${project.version}"
              description="Default Input Transformer.">
         <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
+        <feature>apache-commons</feature>
+        <feature>saxon</feature>
+        <feature>common-system</feature>
+        <feature>apache-commons</feature>
         <bundle>mvn:ddf.catalog.transformer/tika-input-transformer/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-video" version="${project.version}"
              description="Input transformer that handles video files.">
+        <feature>catalog-core-api</feature>
+        <feature>wss4j</feature>
         <bundle>mvn:ddf.catalog.transformer/video-input-transformer/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-json" version="${project.version}"
              description="GeoJSON Transformer translates metacards into GeoJSON.">
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.transformer/geojson-metacard-transformer/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.transformer/geojson-queryresponse-transformer/${project.version}
         </bundle>
@@ -314,6 +334,8 @@
 
     <feature name="catalog-transformer-csv" version="${project.version}"
              description="CSV Query Response Transformer and Common Library.">
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.transformer/csv-queryresponse-transformer/${project.version}</bundle>
     </feature>
 
@@ -327,6 +349,8 @@
     </feature>
 
     <feature name="catalog-transformer-xml" version="${project.version}" description="XML MetacardTransformer and InputTransformer">
+        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-xml/${project.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${xstream.bundle.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${xpp3.bundle.version}</bundle>
@@ -336,35 +360,47 @@
     <feature name="catalog-transformer-zip" version="${project.version}"
              description="ZIP Transformer">
         <feature>saxon</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-zip/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-security-filter" version="${project.version}"
              description="Catalog Security Filtering">
         <feature>security-pdp-authz</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.security/catalog-security-filter/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-security-operationplugin" version="${project.version}"
              description="Catalog Security Operation Plugin">
+        <feature>catalog-core-api</feature>
+        <feature>security-core-api</feature>
         <bundle>mvn:ddf.catalog.security/catalog-security-operationplugin/${project.version}
         </bundle>
     </feature>
 
     <feature name="catalog-security-plugin" version="${project.version}"
              description="Catalog Security Plugins">
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.security/catalog-security-plugin/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-security-resourceplugin" version="${project.version}"
              description="Catalog Resource URI Policy Plugins">
         <feature>security-pdp-authz</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.security/catalog-security-resourceplugin/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-security-policyplugin" version="${project.version}"
              description="Catalog Policy Plugins">
         <feature>security-pdp-authz</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.security/catalog-security-policyplugin/${project.version}</bundle>
     </feature>
 
@@ -372,6 +408,8 @@
              version="${project.version}"
              description="Point of Contact Read Only">
         <feature>security-pdp-authz</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>
             mvn:ddf.catalog.security/catalog-security-pointofcontact-policyplugin/${project.version}
         </bundle>
@@ -383,6 +421,8 @@
              version="${project.version}"
              description="Catalog Metacard Attribute Policy Plugin">
         <feature>security-pdp-authz</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>
             mvn:ddf.catalog.security/catalog-security-metacardattributeplugin/${project.version}
         </bundle>
@@ -391,6 +431,8 @@
     <feature name="catalog-security-xmlattributeplugin" version="${project.version}"
              description="Catalog XML Attribute Policy Plugin">
         <feature>security-pdp-authz</feature>
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.security/catalog-security-xmlattributeplugin/${project.version}
         </bundle>
     </feature>
@@ -398,31 +440,39 @@
     <feature name="catalog-plugin-security-audit" version="${project.version}"
              description="Plugin to audit security changes on metacards.">
         <feature>security-pdp-authz</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-security-audit/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-admin-module-sources" version="${project.version}"
              description="Catalog Admin Module Sources">
+        <feature>admin-core</feature>
         <bundle>mvn:ddf.catalog.admin/catalog-admin-module-sources/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-admin-module-maplayers" version="${project.version}"
              description="Catalog Admin Module Maplayers">
+        <feature>admin-core</feature>
         <bundle>mvn:ddf.catalog.admin/catalog-admin-module-maplayers/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-admin-module-layout" version="${project.version}"
              description="Catalog Admin Module Default Layout">
+        <feature>admin-core</feature>
         <bundle>mvn:ddf.catalog.admin/catalog-admin-module-layout/${project.version}</bundle>
     </feature>
 
     <feature name="admin-poller-service-bean" version="${project.version}"
              description="Admin Poller">
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.admin/catalog-admin-poller-service/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-streaming" version="${project.version}"
              description="Generic Streaming Input Transformer API">
+        <feature>catalog-core-api</feature>
+        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-streaming-api/${project.version}
         </bundle>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-streaming-impl/${project.version}
@@ -431,12 +481,16 @@
 
     <feature name="catalog-plugin-metacard-validation" version="${project.version}"
              description="Metacard Validator Plugins">
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacard-validation/${project.version}
         </bundle>
     </feature>
 
     <feature name="catalog-core-validator" version="${project.version}"
              description="Metacard and attribute validation services">
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:org.codice.countrycode/converter/${countryconverter.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-validator/${project.version}</bundle>
         <feature>catalog-plugin-metacard-validation</feature>
@@ -451,6 +505,8 @@
 
     <feature name="catalog-transformer-pdf" version="${project.version}"
              description="PDF Input Transformer">
+        <feature>action-core-api</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-pdf/${project.version}</bundle>
     </feature>
 
@@ -462,10 +518,14 @@
 
     <feature name="catalog-transformer-pptx" version="${project.version}"
              description="PPTX Input Transformer">
+        <feature>catalog-core-api</feature>
+        <feature>catalog-transformer-tika</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-pptx/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-validator-metacardwkt" version="${project.version}" description="Provides support for WKT validation">
+        <feature>action-core-api</feature>
+        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
         <bundle>mvn:org.codice.ddf.validator/catalog-validator-wkt/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf.validator/catalog-validator-metacardwkt/${project.version}</bundle>
     </feature>
@@ -473,6 +533,8 @@
     <feature name="catalog-validator-metacardduplication"
              version="${project.version}"
              description="Metacard Duplicate Validator">
+        <feature>action-core-api</feature>
+        <feature>apache-commons</feature>
         <bundle>mvn:org.codice.ddf.validator/catalog-validator-metacardduplication/${project.version}</bundle>
     </feature>
 
@@ -492,21 +554,28 @@
 
     <feature name="catalog-transformer-overlay" version="${project.version}"
              description="Transforms a metacard into a geographically aligned image suitable for overlaying on a map">
+        <feature>action-core-api</feature>
+        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-overlay/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-preview" version="${project.version}"
              description="Transforms a metacard into the extracted tika metadata as html">
+        <feature>action-core-impl</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-preview/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-client-info" version="${project.version}"
              description="Places client-specific information from the servlet API into request and response properties">
+        <feature>catalog-core-api</feature>
+        <feature>security-core-api</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-clientinfo/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-metacardingest-network" version="${project.version}"
              description="Conditional attribute enhancement to metacards during ingest using client network information">
+        <feature>action-core-api</feature>
+        <feature>apache-commons</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardingest-network/${project.version}
         </bundle>
     </feature>
@@ -531,16 +600,21 @@
     <feature name="catalog-metacard-backup-s3storage" version="${project.version}"
              description="S3 storage for metacard backup">
         <feature>camel-aws</feature>
+        <feature>catalog-core-api</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-s3storage/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-ftp" version="${project.version}"
              description="FTP endpoint for ingesting files into the catalog. Supports PUT and MPUT operations only. Avoids the extra IO overhead of otherwise having to temporarily write the file to the file system.">
+        <feature>action-core-api</feature>
+        <feature>security-core-api</feature>
         <bundle>mvn:ddf.catalog/ftp/${project.version}</bundle>
         <bundle>mvn:org.apache.mina/mina-core/${mina.version}</bundle>
     </feature>
 
     <feature name="catalog-async-inmemory" version="${project.version}">
+        <feature>action-core-api</feature>
+        <feature>security-core-api</feature>
         <bundle>mvn:ddf.catalog.async/catalog-async-data-api/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-plugin-api/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-processingframework-api/${project.version}</bundle>
