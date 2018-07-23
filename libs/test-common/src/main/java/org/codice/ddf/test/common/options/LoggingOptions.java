@@ -40,7 +40,7 @@ public class LoggingOptions extends BasicOptions {
   }
 
   public static Option codiceLoggingLevel(String logLevel) {
-    recordConfiguration("alliance packages log level: %s=%s", DEFAULT_CODICE_PKG, logLevel);
+    recordConfiguration("codice packages log level: %s=%s", DEFAULT_CODICE_PKG, logLevel);
     return logLevelOption(DEFAULT_CODICE_PKG, logLevel);
   }
 

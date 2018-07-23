@@ -15,26 +15,21 @@ package org.codice.ddf.test.common.features;
 
 import static org.junit.Assert.fail;
 
-import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
 import org.apache.karaf.bundle.core.BundleInfo;
 import org.apache.karaf.bundle.core.BundleService;
 import org.apache.karaf.bundle.core.BundleState;
@@ -43,7 +38,6 @@ import org.codice.ddf.platform.util.XMLUtils;
 import org.ops4j.pax.exam.options.UrlProvisionOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
@@ -51,6 +45,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.google.common.collect.ImmutableMap;
 
 public class FeatureUtilities {
 
@@ -146,8 +142,13 @@ public class FeatureUtilities {
    */
   public static void installAndUninstallFeature(FeaturesService featuresService, String featureName)
       throws Exception {
-    installFeature(featuresService, featureName);
-    uninstallFeature(featuresService, featureName);
+    try {
+      installFeature(featuresService, featureName);
+    } finally {
+      if (featuresService.isInstalled(featuresService.getFeature(featureName))) {
+        uninstallFeature(featuresService, featureName);
+      }
+    }
   }
 
   /**
@@ -162,7 +163,12 @@ public class FeatureUtilities {
     long startTime = System.currentTimeMillis();
     LOGGER.info("{} feature installing", featureName);
     featuresService.installFeature(featureName);
-    waitForRequiredBundles("");
+    List<Bundle> inactiveBundles = waitForBundles();
+    if (!inactiveBundles.isEmpty()) {
+      fail(
+          "Failed to install feature, exceeded bundle startup timeout of: <FIX ME>"
+              + bundleDiagsToString(inactiveBundles));
+    }
     LOGGER.info(
         "{} feature installed in {} ms.", featureName, (System.currentTimeMillis() - startTime));
   }
@@ -184,101 +190,66 @@ public class FeatureUtilities {
   }
 
   // DDF-3768 ServiceManager should be moved to test-common and this duplicate code removed.
-  public static final long FEATURES_AND_BUNDLES_TIMEOUT = TimeUnit.MINUTES.toMillis(10);
+  public static final long FEATURES_AND_BUNDLES_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
 
-  private static final Map<Integer, String> BUNDLE_STATES =
-      new ImmutableMap.Builder<Integer, String>()
-          .put(Bundle.UNINSTALLED, "UNINSTALLED")
-          .put(Bundle.INSTALLED, "INSTALLED")
-          .put(Bundle.RESOLVED, "RESOLVED")
-          .put(Bundle.STARTING, "STARTING")
-          .put(Bundle.STOPPING, "STOPPING")
-          .put(Bundle.ACTIVE, "ACTIVE")
-          .build();
+  public static String bundleDiagsToString(List<Bundle> bundles) {
+    BundleService bundleService = getService(BundleService.class);
+    return "\n"
+        + bundles
+            .stream()
+            .map(b -> bundleService.getDiag(b) + "\n")
+            .collect(Collectors.joining());
+  }
 
-  private static void printInactiveBundles(
-      Consumer<String> headerConsumer, BiConsumer<String, Object[]> logConsumer) {
-    headerConsumer.accept("Listing inactive bundles");
+  public static String bundleNamesToString(List<Bundle> bundles) {
+    BundleService bundleService = getService(BundleService.class);
+    return "\n"
+        + bundles
+            .stream()
+            .map(b -> bundleService.getInfo(b).getName() + "\n")
+            .collect(Collectors.joining());
+  }
+
+  public static List<Bundle> getInactiveBundles() {
+    List<Bundle> inactiveBundles = new ArrayList<>();
+    BundleService bundleService = getService(BundleService.class);
 
     for (Bundle bundle : getBundleContext().getBundles()) {
-      if (bundle.getState() != Bundle.ACTIVE) {
-        Dictionary<String, String> headers = bundle.getHeaders();
-        if (headers.get("Fragment-Host") != null) {
-          continue;
+      BundleInfo bundleInfo = bundleService.getInfo(bundle);
+      BundleState bundleState = bundleInfo.getState();
+      if (bundleInfo.isFragment()) {
+        if (!BundleState.Resolved.equals(bundleState)) {
+          inactiveBundles.add(bundle);
         }
-
-        StringBuilder headerString = new StringBuilder("[ ");
-        Enumeration<String> keys = headers.keys();
-
-        while (keys.hasMoreElements()) {
-          String key = keys.nextElement();
-          headerString.append(key).append("=").append(headers.get(key)).append(", ");
+      } else if (bundleState != null) {
+        if (BundleState.Failure.equals(bundleState)) {
+          inactiveBundles.add(bundle);
+        } else if (!BundleState.Active.equals(bundleState)) {
+          inactiveBundles.add(bundle);
         }
-
-        headerString.append(" ]");
-        logConsumer.accept(
-            "\n\tBundle: {}_v{} | {}\n\tHeaders: {}",
-            new Object[] {
-              bundle.getSymbolicName(),
-              bundle.getVersion(),
-              BUNDLE_STATES.getOrDefault(bundle.getState(), "UNKNOWN"),
-              headerString
-            });
       }
     }
+
+    return inactiveBundles;
   }
 
-  public static void printInactiveBundles() {
-    printInactiveBundles(LOGGER::error, LOGGER::error);
-  }
-
-  public static void waitForRequiredBundles(String symbolicNamePrefix) throws InterruptedException {
-    boolean ready = false;
-    BundleService bundleService = getService(BundleService.class);
+  public static List<Bundle> waitForBundles() throws InterruptedException {
+    boolean ready = getInactiveBundles().isEmpty();
 
     long timeoutLimit = System.currentTimeMillis() + FEATURES_AND_BUNDLES_TIMEOUT;
     while (!ready) {
-      List<Bundle> bundles = Arrays.asList(getBundleContext().getBundles());
-
-      ready = true;
-      for (Bundle bundle : bundles) {
-        if (bundle.getSymbolicName().startsWith(symbolicNamePrefix)) {
-          String bundleName = bundle.getHeaders().get(Constants.BUNDLE_NAME);
-          BundleInfo bundleInfo = bundleService.getInfo(bundle);
-          BundleState bundleState = bundleInfo.getState();
-          if (bundleInfo.isFragment()) {
-            if (!BundleState.Resolved.equals(bundleState)) {
-              LOGGER.info(
-                  "{} bundle not ready yet.\n{}", bundleName, bundleService.getDiag(bundle));
-              ready = false;
-            }
-          } else if (bundleState != null) {
-            if (BundleState.Failure.equals(bundleState)) {
-              printInactiveBundles();
-              fail("The bundle " + bundleName + " failed.");
-            } else if (!BundleState.Active.equals(bundleState)) {
-              LOGGER.debug(
-                  "{} bundle not ready with state {}\n{}",
-                  bundleName,
-                  bundleState,
-                  bundleService.getDiag(bundle));
-              ready = false;
-            }
-          }
-        }
-      }
-
+      List<Bundle> inactiveBundles = getInactiveBundles();
+      ready = inactiveBundles.isEmpty();
       if (!ready) {
+        LOGGER.info("Waiting on bundles: " + bundleNamesToString(inactiveBundles));
         if (System.currentTimeMillis() > timeoutLimit) {
-          printInactiveBundles();
-          fail(
-              String.format(
-                  "Bundles and blueprint did not start within %d minutes.",
-                  TimeUnit.MILLISECONDS.toMinutes(FEATURES_AND_BUNDLES_TIMEOUT)));
+          return inactiveBundles;
         }
-        Thread.sleep(1000);
+        Thread.sleep(5000);
       }
     }
+
+    return new ArrayList<>();
   }
 
   public static <S> S getService(Class<S> aClass) {

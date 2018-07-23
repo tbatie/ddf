@@ -54,7 +54,10 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Embed-Dependency>catalog-core-api-impl;scope=!test</Embed-Dependency>
+                        <Embed-Dependency>
+                            catalog-core-api-impl;scope=!test,
+                            platform-util
+                        </Embed-Dependency>
                         <Export-Package/>
                     </instructions>
                 </configuration>
