@@ -88,4 +88,7 @@ public class PortOptions extends BasicOptions {
     return KarafDistributionOption.editConfigurationFilePut(
         KARAF_SHELL_CFG_FILE_PATH, SSH_PORT_PROPERTY, port);
   }
+
+  // TODO: tbatie - 7/24/18 - Add port option for solr
+
 }

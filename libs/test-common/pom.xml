@@ -149,14 +149,17 @@
             <version>2.1.0</version>
         </dependency>
         <dependency>
-            <groupId>ddf.lib</groupId>
-            <artifactId>common-system</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.karaf.features</groupId>
             <artifactId>org.apache.karaf.features.core</artifactId>
             <version>${karaf.version}</version>
+        </dependency>
+
+        <!--Adding DDF dependencies should be avoided in this module. Adding additional dependencies will result in a large dependency tree when testing, making parallel builds take longer to run tests.
+        It can also create a circular dependency depending on how the tests are written. -->
+        <dependency>
+            <groupId>ddf.lib</groupId>
+            <artifactId>common-system</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>ddf.platform.util</groupId>

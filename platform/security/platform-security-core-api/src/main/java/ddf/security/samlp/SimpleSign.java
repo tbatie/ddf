@@ -13,7 +13,7 @@
  */
 package ddf.security.samlp;
 
-import static com.sun.org.apache.xml.internal.security.signature.XMLSignature.ALGO_ID_SIGNATURE_DSA_SHA256;
+import static org.apache.xml.security.signature.XMLSignature.ALGO_ID_SIGNATURE_DSA_SHA256;
 import static org.apache.commons.lang.CharEncoding.UTF_8;
 
 import java.io.ByteArrayInputStream;

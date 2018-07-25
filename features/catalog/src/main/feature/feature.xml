@@ -54,11 +54,12 @@
 
         <bundle>mvn:ddf.catalog.core/catalog-core-commons/${project.version}</bundle>
         <bundle>mvn:ddf.measure/measure-api/${project.version}</bundle>
-        <bundle>mvn:org.codice.thirdparty/picocontainer/1.2_1</bundle>
-        <bundle>mvn:org.codice.thirdparty/vecmath/1.3.2_1</bundle>
+        <bundle>mvn:org.codice.thirdparty/picocontainer/1.3_1</bundle>
+
+
         <!-- for GeoTools -->
         <bundle>mvn:org.codice.thirdparty/geotools-suite/${org.geotools.bundle.version}</bundle>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>jts</feature>
         <bundle>mvn:commons-collections/commons-collections/${commons-collections.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-federationstrategy/${project.version}</bundle>
         <bundle>mvn:org.codice.thirdparty/lucene-core/3.0.2_1</bundle>
@@ -94,7 +95,7 @@
              description="Catalog core plugins">
         <feature>catalog-core</feature>
         <feature>camel-core</feature>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>jts</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-resourcesizeplugin/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-resourcestatusplugin/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.core/catalog-core-tagsfilterplugin/${project.version}</bundle>
@@ -189,6 +190,8 @@
         <feature>mime-tika-resolver</feature>
         <feature>action-core-impl</feature>
         <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr339-api-2.0.1/2.6.0</bundle>
+        <bundle>mvn:ddf.catalog.rest/catalog-rest-service/${project.version}</bundle>
+        <bundle>mvn:ddf.catalog.rest/catalog-rest-impl/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.rest/catalog-rest-endpoint/${project.version}</bundle>
     </feature>
 
@@ -200,7 +203,7 @@
         <feature>action-core-api</feature>
         <feature>catalog-core-api</feature>
         <feature>catalog-core</feature>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>jts</feature>
         <bundle>mvn:org.apache.abdera/abdera-extensions-opensearch/${abdera.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-server/${abdera.version}</bundle>
     </feature>
@@ -213,7 +216,7 @@
         <feature>catalog-core-api</feature>
         <feature>catalog-core</feature>
         <feature>catalog-transformer-geoformatter</feature>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>jts</feature>
 
         <bundle>mvn:org.apache.abdera/abdera-server/${abdera.version}</bundle>
         <bundle>mvn:ddf.catalog.opensearch/catalog-opensearch-source/${project.version}</bundle>
@@ -229,8 +232,12 @@
         <feature>security-expansion</feature>
         <feature>javax-validation</feature>
         <feature>cxf-jaxws</feature>
-        <bundle>mvn:ddf.catalog.confluence/catalog-confluence-source/${project.version}</bundle>
+        <feature>util-uuidgenerator</feature>
+        <feature>security-handler-api</feature>
+        <feature>catalog-core</feature>
+        <feature>catalog-core-plugins</feature>
         <bundle>mvn:io.fastjson/boon/${boon.version}</bundle>
+        <bundle>mvn:ddf.catalog.confluence/catalog-confluence-source/${project.version}</bundle>
     </feature>
 
     <feature name="abdera" version="${project.version}"
@@ -260,6 +267,8 @@
         <feature>apache-commons</feature>
         <feature>cxf-jaxrs</feature>
         <feature>common-system</feature>
+        <feature>spring</feature>
+        <feature>catalog-transformer-json</feature>
         <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr339-api-2.0.1/2.6.0</bundle>
         <bundle>mvn:ddf.catalog.plugin/plugin-federation-replication/${project.version}</bundle>
     </feature>
@@ -321,6 +330,7 @@
         <feature>wss4j</feature>
         <feature>common-system</feature>
         <feature>spring</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.transformer/video-input-transformer/${project.version}</bundle>
     </feature>
 
@@ -332,6 +342,7 @@
         <feature>spring</feature>
         <feature>catalog-transformer-geoformatter</feature>
         <feature>common-system</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.transformer/geojson-metacard-transformer/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.transformer/geojson-queryresponse-transformer/${project.version}
         </bundle>
@@ -344,7 +355,10 @@
         <feature>jodah-failsafe</feature>
         <feature>abdera</feature>
         <feature>action-core-api</feature>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>jts</feature>
+        <feature>catalog-core-api</feature>
+        <feature>catalog-transformer-geoformatter</feature>
+
         <bundle>mvn:org.apache.abdera/abdera-extensions-opensearch/${abdera.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-extensions-geo/${abdera.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-server/${abdera.version}</bundle>
@@ -365,10 +379,10 @@
     <feature name="catalog-transformer-geoformatter" version="${project.version}"
              description="Geo library to help with conversion of geometry objects into various formats such GeoJson, GeoRSS, etc.">
         <feature>abdera</feature>
-        <bundle>mvn:ddf.catalog.common/geo-formatter/${project.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-extensions-geo/${abdera.version}</bundle>
         <bundle>mvn:com.googlecode.json-simple/json-simple/1.1.1</bundle>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>jts</feature>
+        <bundle>mvn:ddf.catalog.common/geo-formatter/${project.version}</bundle>
     </feature>
 
     <feature name="catalog-transformer-xml" version="${project.version}" description="XML MetacardTransformer and InputTransformer">
@@ -377,7 +391,9 @@
         <feature>saxon</feature>
         <feature>common-system</feature>
         <feature>parser-xml</feature>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>jts</feature>
+        <feature>spring</feature>
+
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-xml/${project.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xstream/${xstream.bundle.version}</bundle>
         <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xpp3/${xpp3.bundle.version}</bundle>
@@ -389,6 +405,7 @@
         <feature>action-core-api</feature>
         <feature>catalog-core-api</feature>
         <feature>security-core-api</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-zip/${project.version}</bundle>
     </feature>
 
@@ -412,7 +429,7 @@
              description="Catalog Security Plugins">
         <feature>action-core-api</feature>
         <feature>catalog-core-api</feature>
-        <feature>security-core-api</feature>
+        <feature>security-core</feature>
         <bundle>mvn:ddf.catalog.security/catalog-security-plugin/${project.version}</bundle>
     </feature>
 
@@ -505,6 +522,9 @@
         <feature>catalog-core-api</feature>
         <feature>apache-commons</feature>
         <feature>common-system</feature>
+        <feature>jts</feature>
+        <feature>spring</feature>
+        <bundle>mvn:org.codice.thirdparty/picocontainer/1.3_1</bundle>
         <bundle>mvn:org.codice.thirdparty/geotools-suite/${org.geotools.bundle.version}</bundle>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-streaming-api/${project.version}
         </bundle>
@@ -519,6 +539,7 @@
         <feature>apache-commons</feature>
         <feature>common-system</feature>
         <feature>spring</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacard-validation/${project.version}
         </bundle>
     </feature>
@@ -539,6 +560,7 @@
         <feature>catalog-core-validator</feature>
         <feature>apache-commons</feature>
         <feature>common-system</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:ddf.catalog.core/catalog-core-validationparser/${project.version}</bundle>
         <bundle>mvn:io.fastjson/boon/${boon.version}</bundle>
     </feature>
@@ -571,7 +593,8 @@
         <feature>catalog-core-api</feature>
         <feature>apache-commons</feature>
         <feature>common-system</feature>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>spring</feature>
+        <feature>jts</feature>
         <bundle>mvn:org.codice.ddf.validator/catalog-validator-wkt/${project.version}</bundle>
         <bundle>mvn:org.codice.ddf.validator/catalog-validator-metacardwkt/${project.version}</bundle>
     </feature>
@@ -584,6 +607,7 @@
         <feature>catalog-core-api</feature>
         <feature>common-system</feature>
         <feature>spring</feature>
+        <feature>catalog-core</feature>
         <bundle>mvn:org.codice.ddf.validator/catalog-validator-metacardduplication/${project.version}</bundle>
     </feature>
 
@@ -605,7 +629,7 @@
              description="Transforms a metacard into a geographically aligned image suitable for overlaying on a map">
         <feature>action-core-api</feature>
         <feature>catalog-core</feature>
-        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+        <feature>jts</feature>
         <bundle>mvn:ddf.catalog.transformer/catalog-transformer-overlay/${project.version}</bundle>
     </feature>
 
@@ -659,6 +683,7 @@
         <feature>common-system</feature>
         <feature>cxf-frontend-javascript</feature>
         <feature>spring</feature>
+        <feature>camel-blueprint</feature>
         <bundle>mvn:ddf.catalog.plugin/catalog-plugin-metacardbackup-s3storage/${project.version}</bundle>
     </feature>
 
@@ -679,6 +704,11 @@
         <feature>catalog-core-api</feature>
         <feature>security-expansion</feature>
         <feature>javax-validation</feature>
+        <feature>cxf-jaxws</feature>
+        <feature>cxf-jaxrs</feature>
+        <feature>security-handler-api</feature>
+        <feature>catalog-core</feature>
+
         <bundle>mvn:ddf.catalog.async/catalog-async-data-api/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-plugin-api/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-processingframework-api/${project.version}</bundle>
@@ -686,4 +716,19 @@
         <bundle>mvn:ddf.catalog.async/catalog-async-processingframework/${project.version}</bundle>
     </feature>
 
+    <feature name="catalog-ftp" version="${project.version}"
+             description="FTP endpoint for ingesting files into the catalog. Supports PUT and MPUT operations only. Avoids the extra IO overhead of otherwise having to temporarily write the file to the file system.">
+        <feature>action-core-api</feature>
+        <feature>security-core-api</feature>
+        <feature>catalog-core-api</feature>
+        <feature>util-uuidgenerator</feature>
+        <feature>security-handler-api</feature>
+        <bundle>mvn:ddf.catalog/ftp/${project.version}</bundle>
+        <bundle>mvn:org.apache.mina/mina-core/${mina.version}</bundle>
+    </feature>
+
+    <feature name="jts" version="${project.version}">
+        <bundle>mvn:com.googlecode.json-simple/json-simple/1.1.1</bundle>
+        <bundle>mvn:org.codice.thirdparty/jts/${jts.bundle.version}</bundle>
+    </feature>
 </features>

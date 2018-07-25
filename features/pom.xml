@@ -39,9 +39,9 @@
         <module>solr</module>
         <module>security</module>
         <module>utilities</module>
+        <module>catalog</module>
         <module>apps</module>
         <module>install-profiles</module>
-        <module>catalog</module>
     </modules>
 
     <properties>

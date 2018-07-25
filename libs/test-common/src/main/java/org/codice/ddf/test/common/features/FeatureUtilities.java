@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,8 +44,6 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-
-import com.google.common.collect.ImmutableMap;
 
 public class FeatureUtilities {
 
@@ -166,7 +163,7 @@ public class FeatureUtilities {
     List<Bundle> inactiveBundles = waitForBundles();
     if (!inactiveBundles.isEmpty()) {
       fail(
-          "Failed to install feature, exceeded bundle startup timeout of: <FIX ME>"
+          "Failed to install feature: " + featureName + ", exceeded bundle startup timeout of: " + FEATURES_AND_BUNDLES_TIMEOUT
               + bundleDiagsToString(inactiveBundles));
     }
     LOGGER.info(
@@ -197,7 +194,7 @@ public class FeatureUtilities {
     return "\n"
         + bundles
             .stream()
-            .map(b -> bundleService.getDiag(b) + "\n")
+            .map(b -> b.getSymbolicName() + "\n" + bundleService.getDiag(b) + "\n")
             .collect(Collectors.joining());
   }
 
