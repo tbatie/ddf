@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -51,6 +52,8 @@ public class FeatureUtilities {
 
   public static final String FEATURE_NAME_XPATH = "//*[local-name() = 'feature']/@name";
 
+  private static BundleService bundleService;
+
   /**
    * Returns a list of feature names defined in a feature file.
    *
@@ -58,25 +61,25 @@ public class FeatureUtilities {
    * @return feature names in feature file
    */
   public static List<String> getFeaturesFromFeatureRepo(String featureFilePath) {
-    XPath xPath = XPathFactory.newInstance().newXPath();
+    XPath xPath = XPathFactory.newInstance()
+            .newXPath();
     List<String> featureNames = new ArrayList<>();
 
     try (FileInputStream fi = new FileInputStream(new File(featureFilePath))) {
-      Document featuresFile = XMLUtils.getInstance().getSecureDocumentBuilder(false).parse(fi);
+      Document featuresFile = XMLUtils.getInstance()
+              .getSecureDocumentBuilder(false)
+              .parse(fi);
 
-      NodeList features =
-          (NodeList)
-              xPath.compile(FEATURE_NAME_XPATH).evaluate(featuresFile, XPathConstants.NODESET);
+      NodeList features = (NodeList) xPath.compile(FEATURE_NAME_XPATH)
+              .evaluate(featuresFile, XPathConstants.NODESET);
 
       for (int i = 0; i < features.getLength(); i++) {
-        featureNames.add(features.item(i).getNodeValue());
+        featureNames.add(features.item(i)
+                .getNodeValue());
       }
-    } catch (ParserConfigurationException
-        | XPathExpressionException
-        | IOException
-        | SAXException e) {
+    } catch (ParserConfigurationException | XPathExpressionException | IOException | SAXException e) {
       throw new RuntimeException(
-          "Unable to read features names in feature file at: " + featureFilePath, e);
+              "Unable to read features names in feature file at: " + featureFilePath, e);
     }
     return featureNames;
   }
@@ -100,13 +103,12 @@ public class FeatureUtilities {
    * @param ignoredFeatures excludes the specified features from the parameters
    * @return feature name parameters
    */
-  public static List<Object[]> featureRepoToFeatureParameters(
-      String featureFilePath, List<String> ignoredFeatures) {
-    return getFeaturesFromFeatureRepo(featureFilePath)
-        .stream()
-        .filter(f -> !ignoredFeatures.contains(f))
-        .map(feat -> new Object[] {feat})
-        .collect(Collectors.toList());
+  public static List<Object[]> featureRepoToFeatureParameters(String featureFilePath,
+          List<String> ignoredFeatures) {
+    return getFeaturesFromFeatureRepo(featureFilePath).stream()
+            .filter(f -> !ignoredFeatures.contains(f))
+            .map(feat -> new Object[] {feat})
+            .collect(Collectors.toList());
   }
 
   /**
@@ -138,7 +140,7 @@ public class FeatureUtilities {
    * @throws Exception
    */
   public static void installAndUninstallFeature(FeaturesService featuresService, String featureName)
-      throws Exception {
+          throws Exception {
     try {
       installFeature(featuresService, featureName);
     } finally {
@@ -156,18 +158,18 @@ public class FeatureUtilities {
    * @throws Exception
    */
   public static void installFeature(FeaturesService featuresService, String featureName)
-      throws Exception {
+          throws Exception {
     long startTime = System.currentTimeMillis();
     LOGGER.info("{} feature installing", featureName);
     featuresService.installFeature(featureName);
     List<Bundle> inactiveBundles = waitForBundles();
     if (!inactiveBundles.isEmpty()) {
-      fail(
-          "Failed to install feature: " + featureName + ", exceeded bundle startup timeout of: " + FEATURES_AND_BUNDLES_TIMEOUT
-              + bundleDiagsToString(inactiveBundles));
+      fail("Failed to install feature: " + featureName + ", exceeded bundle startup timeout of: "
+              + FEATURES_AND_BUNDLES_TIMEOUT + bundleDiagsToString(inactiveBundles));
     }
-    LOGGER.info(
-        "{} feature installed in {} ms.", featureName, (System.currentTimeMillis() - startTime));
+    LOGGER.info("{} feature installed in {} ms.",
+            featureName,
+            (System.currentTimeMillis() - startTime));
   }
 
   /**
@@ -178,41 +180,36 @@ public class FeatureUtilities {
    * @throws Exception
    */
   public static void uninstallFeature(FeaturesService featuresService, String featureName)
-      throws Exception {
+          throws Exception {
     long startTime = System.currentTimeMillis();
     LOGGER.info("{} feature uninstalling", featureName);
     featuresService.uninstallFeature(featureName);
-    LOGGER.info(
-        "{} feature uninstalled in {} ms.", featureName, (System.currentTimeMillis() - startTime));
+    LOGGER.info("{} feature uninstalled in {} ms.",
+            featureName,
+            (System.currentTimeMillis() - startTime));
   }
 
   // DDF-3768 ServiceManager should be moved to test-common and this duplicate code removed.
   public static final long FEATURES_AND_BUNDLES_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
 
   public static String bundleDiagsToString(List<Bundle> bundles) {
-    BundleService bundleService = getService(BundleService.class);
-    return "\n"
-        + bundles
-            .stream()
-            .map(b -> b.getSymbolicName() + "\n" + bundleService.getDiag(b) + "\n")
+    return "\n" + bundles.stream()
+            .map(b -> b.getSymbolicName() + "\n" + getBundleService().getDiag(b) + "\n")
             .collect(Collectors.joining());
   }
 
   public static String bundleNamesToString(List<Bundle> bundles) {
-    BundleService bundleService = getService(BundleService.class);
-    return "\n"
-        + bundles
-            .stream()
-            .map(b -> bundleService.getInfo(b).getName() + "\n")
+    return "\n" + bundles.stream()
+            .map(b -> getBundleService().getInfo(b)
+                    .getName() + "\n")
             .collect(Collectors.joining());
   }
 
   public static List<Bundle> getInactiveBundles() {
     List<Bundle> inactiveBundles = new ArrayList<>();
-    BundleService bundleService = getService(BundleService.class);
 
     for (Bundle bundle : getBundleContext().getBundles()) {
-      BundleInfo bundleInfo = bundleService.getInfo(bundle);
+      BundleInfo bundleInfo = getBundleService().getInfo(bundle);
       BundleState bundleState = bundleInfo.getState();
       if (bundleInfo.isFragment()) {
         if (!BundleState.Resolved.equals(bundleState)) {
@@ -247,6 +244,14 @@ public class FeatureUtilities {
     }
 
     return new ArrayList<>();
+  }
+
+  public static BundleService getBundleService() {
+    if(bundleService == null) {
+      bundleService = getService(BundleService.class);
+    }
+
+    return bundleService;
   }
 
   public static <S> S getService(Class<S> aClass) {

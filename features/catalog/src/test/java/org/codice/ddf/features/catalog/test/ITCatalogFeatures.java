@@ -26,6 +26,7 @@ import static org.ops4j.pax.exam.CoreOptions.options;
 
 import java.util.List;
 import javax.inject.Inject;
+
 import org.apache.karaf.features.FeaturesService;
 import org.codice.ddf.test.common.features.FeatureUtilities;
 import org.codice.ddf.test.common.features.TestUtilitiesFeatures;
@@ -37,12 +38,15 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExamParameterized;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
+import org.parboiled.common.ImmutableList;
 
 @RunWith(PaxExamParameterized.class)
 @ExamReactorStrategy(PerClass.class)
 public class ITCatalogFeatures {
 
   private static final String FEATURE_REPO_PATH = getTestResource("/features.xml");
+
+  public static final List<String> UNSTABLE_FEATURES = ImmutableList.of("catalog-ftp");
 
   @Configuration
   public static Option[] examConfiguration() {
@@ -59,7 +63,7 @@ public class ITCatalogFeatures {
 
   @Parameterized.Parameters
   public static List<Object[]> getParameters() {
-    return FeatureUtilities.featureRepoToFeatureParameters(FEATURE_REPO_PATH);
+    return FeatureUtilities.featureRepoToFeatureParameters(FEATURE_REPO_PATH, UNSTABLE_FEATURES);
   }
 
   @Inject private FeaturesService featuresService;

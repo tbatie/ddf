@@ -358,6 +358,8 @@
         <feature>jts</feature>
         <feature>catalog-core-api</feature>
         <feature>catalog-transformer-geoformatter</feature>
+        <feature>apache-commons</feature>
+        <feature>common-system</feature>
 
         <bundle>mvn:org.apache.abdera/abdera-extensions-opensearch/${abdera.version}</bundle>
         <bundle>mvn:org.apache.abdera/abdera-extensions-geo/${abdera.version}</bundle>
@@ -694,6 +696,7 @@
         <feature>catalog-core-api</feature>
         <feature>util-uuidgenerator</feature>
         <feature>security-handler-api</feature>
+
         <bundle>mvn:ddf.catalog/ftp/${project.version}</bundle>
         <bundle>mvn:org.apache.mina/mina-core/${mina.version}</bundle>
     </feature>
@@ -714,17 +717,6 @@
         <bundle>mvn:ddf.catalog.async/catalog-async-processingframework-api/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-postingestplugin/${project.version}</bundle>
         <bundle>mvn:ddf.catalog.async/catalog-async-processingframework/${project.version}</bundle>
-    </feature>
-
-    <feature name="catalog-ftp" version="${project.version}"
-             description="FTP endpoint for ingesting files into the catalog. Supports PUT and MPUT operations only. Avoids the extra IO overhead of otherwise having to temporarily write the file to the file system.">
-        <feature>action-core-api</feature>
-        <feature>security-core-api</feature>
-        <feature>catalog-core-api</feature>
-        <feature>util-uuidgenerator</feature>
-        <feature>security-handler-api</feature>
-        <bundle>mvn:ddf.catalog/ftp/${project.version}</bundle>
-        <bundle>mvn:org.apache.mina/mina-core/${mina.version}</bundle>
     </feature>
 
     <feature name="jts" version="${project.version}">
