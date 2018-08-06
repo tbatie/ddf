@@ -24,4 +24,7 @@ public class SystemProperties {
   public static final String HTTP_PORT_PROPERTY = "org.codice.ddf.system.httpPort";
 
   public static final String FTP_PORT_PROPERTY = "org.codice.ddf.catalog.ftp.port";
+
+  public static final String SOLR_PORT_PROPERTY = "solr.http.port";
+
 }

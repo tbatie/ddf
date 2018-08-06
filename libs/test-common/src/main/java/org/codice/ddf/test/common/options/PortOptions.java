@@ -13,6 +13,9 @@
  */
 package org.codice.ddf.test.common.options;
 
+import static org.codice.ddf.test.common.options.SystemProperties.SOLR_PORT_PROPERTY;
+import static org.codice.ddf.test.common.options.SystemProperties.SYSTEM_PROPERTIES_FILE_PATH;
+
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.options.DefaultCompositeOption;
@@ -41,6 +44,8 @@ public class PortOptions extends BasicOptions {
   private static final String RMI_SERVER_PORT_KEY = "rmiServerPort";
 
   private static final String SSH_PORT_KEY = "sshPort";
+
+  private static final String SOLR_PORT_KEY = "solrPort";
 
   public static Option defaultPortsOptions() {
     return new DefaultCompositeOption(
@@ -89,6 +94,12 @@ public class PortOptions extends BasicOptions {
         KARAF_SHELL_CFG_FILE_PATH, SSH_PORT_PROPERTY, port);
   }
 
+  public static Option solrPort() {
+    String port = getPortFinder().getPortAsString(SOLR_PORT_KEY);
+    recordConfiguration("%s=%s", SOLR_PORT_KEY, port);
+    return KarafDistributionOption.editConfigurationFilePut(
+            SYSTEM_PROPERTIES_FILE_PATH, SOLR_PORT_PROPERTY, port);
+  }
   // TODO: tbatie - 7/24/18 - Add port option for solr
 
 }

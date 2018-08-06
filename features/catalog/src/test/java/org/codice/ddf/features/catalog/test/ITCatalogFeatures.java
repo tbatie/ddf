@@ -38,7 +38,8 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.junit.PaxExamParameterized;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
-import org.parboiled.common.ImmutableList;
+
+import com.google.common.collect.ImmutableList;
 
 @RunWith(PaxExamParameterized.class)
 @ExamReactorStrategy(PerClass.class)

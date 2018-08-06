@@ -199,6 +199,9 @@
                 <artifactId>maven-bundle-plugin</artifactId>
                 <configuration>
                     <instructions>
+                        <Bundle-Activator>
+                            org.codice.ddf.test.common.options.LoggingOptions
+                        </Bundle-Activator>
                         <Bundle-SymbolicName>
                             ${project.groupId}.${project.artifactId}
                         </Bundle-SymbolicName>

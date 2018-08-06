@@ -23,7 +23,9 @@ import org.codice.ddf.test.common.configurators.PortFinder;
 /** Base class for common test options logic. */
 public abstract class BasicOptions {
 
-  private static final Path CONFIGURATION_LOG_PATH = Paths.get("target", "test-configuration.log");
+  public static final String TEST_CONFIGURATION_FILE_NAME = "test-configuration.log";
+
+  public static final Path CONFIGURATION_LOG_PATH = Paths.get("target", "test-classes",TEST_CONFIGURATION_FILE_NAME);
 
   private static final PortFinder PORT_FINDER = new PortFinder();
 
