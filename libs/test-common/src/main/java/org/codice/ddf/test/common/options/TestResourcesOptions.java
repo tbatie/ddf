@@ -13,6 +13,7 @@
  */
 package org.codice.ddf.test.common.options;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
@@ -48,5 +49,9 @@ public class TestResourcesOptions {
    */
   public static String getTestResource(String resourcePath) {
     return System.getProperty(TEST_RESOURCES_DIR, DEFAULT_TEST_RESOURCES_PATH) + resourcePath;
+  }
+
+  public static String getTestResource(Path resourcePath) {
+    return getTestResource(resourcePath.toString());
   }
 }

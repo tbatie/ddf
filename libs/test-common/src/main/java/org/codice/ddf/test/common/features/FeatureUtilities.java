@@ -13,14 +13,18 @@
  */
 package org.codice.ddf.test.common.features;
 
+import static org.codice.ddf.test.common.options.TestResourcesOptions.getTestResource;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -35,6 +39,7 @@ import org.apache.karaf.bundle.core.BundleService;
 import org.apache.karaf.bundle.core.BundleState;
 import org.apache.karaf.features.FeaturesService;
 import org.codice.ddf.platform.util.XMLUtils;
+import org.codice.ddf.test.common.options.BasicOptions;
 import org.ops4j.pax.exam.options.UrlProvisionOption;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -52,6 +57,12 @@ public class FeatureUtilities {
 
   public static final String FEATURE_NAME_XPATH = "//*[local-name() = 'feature']/@name";
 
+  // TODO: tbatie - 8/6/18 - Look into the TestWatcher or something else for all this test logging crap
+  public static final String FEATURE_INSTALL_TIMES_LOG = getTestResource("/feature-install-times.log");
+
+  public static final String FEATURE_UNINSTALL_TIMES_LOG = getTestResource(
+          "/feature-uninstall-times.log");
+
   private static BundleService bundleService;
 
   /**
@@ -61,23 +72,23 @@ public class FeatureUtilities {
    * @return feature names in feature file
    */
   public static List<String> getFeaturesFromFeatureRepo(String featureFilePath) {
-    XPath xPath = XPathFactory.newInstance()
-            .newXPath();
+    XPath xPath = XPathFactory.newInstance().newXPath();
     List<String> featureNames = new ArrayList<>();
 
     try (FileInputStream fi = new FileInputStream(new File(featureFilePath))) {
-      Document featuresFile = XMLUtils.getInstance()
-              .getSecureDocumentBuilder(false)
-              .parse(fi);
+      Document featuresFile = XMLUtils.getInstance().getSecureDocumentBuilder(false).parse(fi);
 
-      NodeList features = (NodeList) xPath.compile(FEATURE_NAME_XPATH)
-              .evaluate(featuresFile, XPathConstants.NODESET);
+      NodeList features =
+          (NodeList)
+              xPath.compile(FEATURE_NAME_XPATH).evaluate(featuresFile, XPathConstants.NODESET);
 
       for (int i = 0; i < features.getLength(); i++) {
-        featureNames.add(features.item(i)
-                .getNodeValue());
+        featureNames.add(features.item(i).getNodeValue());
       }
-    } catch (ParserConfigurationException | XPathExpressionException | IOException | SAXException e) {
+    } catch (ParserConfigurationException
+        | XPathExpressionException
+        | IOException
+        | SAXException e) {
       throw new RuntimeException(
               "Unable to read features names in feature file at: " + featureFilePath, e);
     }
@@ -103,9 +114,10 @@ public class FeatureUtilities {
    * @param ignoredFeatures excludes the specified features from the parameters
    * @return feature name parameters
    */
-  public static List<Object[]> featureRepoToFeatureParameters(String featureFilePath,
-          List<String> ignoredFeatures) {
-    return getFeaturesFromFeatureRepo(featureFilePath).stream()
+  public static List<Object[]> featureRepoToFeatureParameters(
+      String featureFilePath, List<String> ignoredFeatures) {
+    return getFeaturesFromFeatureRepo(featureFilePath)
+        .stream()
             .filter(f -> !ignoredFeatures.contains(f))
             .map(feat -> new Object[] {feat})
             .collect(Collectors.toList());
@@ -165,11 +177,14 @@ public class FeatureUtilities {
     List<Bundle> inactiveBundles = waitForBundles();
     if (!inactiveBundles.isEmpty()) {
       fail("Failed to install feature: " + featureName + ", exceeded bundle startup timeout of: "
-              + FEATURES_AND_BUNDLES_TIMEOUT + bundleDiagsToString(inactiveBundles));
+              + FEATURES_AND_BUNDLES_TIMEOUT + "\n" + bundleDiagsToString(inactiveBundles));
     }
+    long installTime = (System.currentTimeMillis() - startTime);
+
     LOGGER.info("{} feature installed in {} ms.",
             featureName,
-            (System.currentTimeMillis() - startTime));
+            installTime);
+    recordFeatureInstallTime(featureName, installTime);
   }
 
   /**
@@ -184,22 +199,32 @@ public class FeatureUtilities {
     long startTime = System.currentTimeMillis();
     LOGGER.info("{} feature uninstalling", featureName);
     featuresService.uninstallFeature(featureName);
+    long uninstallTime = (System.currentTimeMillis() - startTime);
     LOGGER.info("{} feature uninstalled in {} ms.",
             featureName,
-            (System.currentTimeMillis() - startTime));
+            uninstallTime);
+    recordFeatureUninstallTime(featureName, uninstallTime);
+  }
+
+  private static void recordFeatureInstallTime(String feature, long installTime) {
+    BasicOptions.writeToFile(FEATURE_INSTALL_TIMES_LOG, "%s: %n ms", feature, Long.toString(installTime));
+  }
+
+  private static void recordFeatureUninstallTime(String feature, long uninstallTime) {
+    BasicOptions.writeToFile(FEATURE_UNINSTALL_TIMES_LOG, "%s: %n ms", feature, Long.toString(uninstallTime));
   }
 
   // DDF-3768 ServiceManager should be moved to test-common and this duplicate code removed.
   public static final long FEATURES_AND_BUNDLES_TIMEOUT = TimeUnit.MINUTES.toMillis(1);
 
   public static String bundleDiagsToString(List<Bundle> bundles) {
-    return "\n" + bundles.stream()
+    return bundles.stream()
             .map(b -> b.getSymbolicName() + "\n" + getBundleService().getDiag(b) + "\n")
             .collect(Collectors.joining());
   }
 
   public static String bundleNamesToString(List<Bundle> bundles) {
-    return "\n" + bundles.stream()
+    return bundles.stream()
             .map(b -> getBundleService().getInfo(b)
                     .getName() + "\n")
             .collect(Collectors.joining());
@@ -235,7 +260,7 @@ public class FeatureUtilities {
       List<Bundle> inactiveBundles = getInactiveBundles();
       ready = inactiveBundles.isEmpty();
       if (!ready) {
-        LOGGER.info("Waiting on bundles: " + bundleNamesToString(inactiveBundles));
+        LOGGER.info("Waiting on bundles:\n" + bundleNamesToString(inactiveBundles));
         if (System.currentTimeMillis() > timeoutLimit) {
           return inactiveBundles;
         }

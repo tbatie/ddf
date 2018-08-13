@@ -47,6 +47,7 @@ public class ITCatalogFeatures {
 
   private static final String FEATURE_REPO_PATH = getTestResource("/features.xml");
 
+  //There is some dependency in this feature manipulating the classloader that causes service references in the these test tools to fail.
   public static final List<String> UNSTABLE_FEATURES = ImmutableList.of("catalog-ftp");
 
   @Configuration

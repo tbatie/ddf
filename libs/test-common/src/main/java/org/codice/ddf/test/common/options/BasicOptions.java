@@ -30,12 +30,20 @@ public abstract class BasicOptions {
   private static final PortFinder PORT_FINDER = new PortFinder();
 
   public static void recordConfiguration(String format, String... args) {
+    writeToFile(CONFIGURATION_LOG_PATH, format, args);
+  }
+
+  public static void writeToFile(String filePath, String format, String... args) {
+    writeToFile(Paths.get(filePath), format, args);
+  }
+
+  public static void writeToFile(Path filePath, String format, String... args) {
     try {
       Files.write(
-          CONFIGURATION_LOG_PATH,
-          String.format(format + System.lineSeparator(), args).getBytes(),
-          StandardOpenOption.CREATE,
-          StandardOpenOption.APPEND);
+              filePath,
+              String.format(format + System.lineSeparator(), args).getBytes(),
+              StandardOpenOption.CREATE,
+              StandardOpenOption.APPEND);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
