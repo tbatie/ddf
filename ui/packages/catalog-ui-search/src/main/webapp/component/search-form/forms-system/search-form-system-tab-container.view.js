@@ -14,7 +14,7 @@
  **/
 /* global require */
 import React from 'react'
-import styled from '../../../react-component/styles/styled-components'
+import styled from '@connexta/atlas/styled'
 const Marionette = require('marionette')
 const SearchFormCollectionView = require('../search-form.collection.view')
 const SearchFormCollection = require('../search-form-collection-instance')

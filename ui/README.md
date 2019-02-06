@@ -48,6 +48,11 @@ default [webpack.config.js](./packages/ace/lib/webpack.config.js), some
 use [grunt](https://gruntjs.com/). New packages should favor ace over
 grunt.
 
+### Accessing The Developer Guide
+
+After starting up the dev server in the catalog-ui-search module, navigate to the hamburger
+menu in the upper left hand corner of Intrigue. Select the option `"Developer Guide"`
+
 ### Tests
 
 To test all packages, do:

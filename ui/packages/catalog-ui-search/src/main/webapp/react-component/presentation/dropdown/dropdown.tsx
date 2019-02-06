@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { hot } from 'react-hot-loader'
 import Portal from '../portal'
-import styled, { ThemeInterface } from '../../styles/styled-components'
+import styled, { ThemeInterface } from '@connexta/atlas/styled'
 import { Dropshadow } from '../../styles/mixins'
 import ChangeBackground from '../change-background'
 import ButtonBehavior from '../button-behavior'
@@ -347,6 +347,7 @@ class Dropdown extends React.Component<Props, State> {
             }}
           >
             <Portal>
+              //@ts-ignore
               <ChangeBackground color={theme => theme.backgroundDropdown}>
                 <DropdownWrapper
                   className={contentClassName}

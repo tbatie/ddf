@@ -10,7 +10,7 @@
  *
  **/
 import * as React from 'react'
-import styled from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 import { CustomElement } from '../../styles/mixins'
 const LoadingCompanionView = require('../../../component/loading-companion/loading-companion.view.js')
 

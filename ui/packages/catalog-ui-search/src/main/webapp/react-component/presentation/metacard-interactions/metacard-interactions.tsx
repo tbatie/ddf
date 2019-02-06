@@ -1,5 +1,5 @@
 import * as React from 'react'
-import styled from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 
 export const Divider = () => <div className="is-divider composed-menu" />
 

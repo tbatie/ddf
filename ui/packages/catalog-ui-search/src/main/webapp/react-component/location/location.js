@@ -6,7 +6,7 @@ const Button = require('../button')
 const Dropdown = require('../dropdown')
 const Json = require('../json')
 const { Menu, MenuItem } = require('../menu')
-import styled from '../styles/styled-components/styled-components'
+import styled from '@connexta/atlas/styled'
 
 const Line = require('./line')
 const Polygon = require('./polygon')

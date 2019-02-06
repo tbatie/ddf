@@ -10,8 +10,8 @@
  *
  **/
 import * as React from 'react'
-import styled from '../../styles/styled-components'
-import { keyframes } from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
+import { keyframes } from '@connexta/atlas/styled'
 import { CustomElement } from '../../styles/mixins'
 import { Button, buttonTypeEnum } from '../button'
 import plugin from 'plugins/navigation-right'
@@ -81,6 +81,7 @@ const Root = styled<Props, 'div'>('div')`
     white-space: nowrap;
     vertical-align: top;
     position: relative;
+    ${props => (props.isGuest ? 'display:none;' : '')};
   }
 
   .user-unique span:first-of-type {
@@ -101,10 +102,6 @@ const Root = styled<Props, 'div'>('div')`
     line-height: inherit !important;
     vertical-align: top;
     transform: translateY(-50%);
-  }
-
-  .user-unique {
-    ${props => (props.isGuest ? 'display:none;' : '')};
   }
 
   .user-guest {

@@ -10,7 +10,7 @@
  *
  **/
 import * as React from 'react'
-import styled from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 import { hot } from 'react-hot-loader'
 import WorkspaceInteractions from '../../container/workspace-interactions'
 const QueryAddView = require('../../../component/query-add/query-add.view.js')

@@ -1,7 +1,7 @@
 const React = require('react')
 const { createPortal } = require('react-dom')
 
-import styled from '../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 
 class Poller extends React.Component {
   constructor(props) {

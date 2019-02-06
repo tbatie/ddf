@@ -17,7 +17,7 @@ const SearchSettings = require('../../../component/search-settings/search-settin
 const HiddenSettings = require('../../../component/user-blacklist/user-blacklist.view.js')
 const TimeSettings = require('../../../component/time-settings/time-settings.view.js')
 import MarionetteRegionContainer from '../../container/marionette-region-container'
-import styled from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 import { Button, buttonTypeEnum } from '../button'
 import { hot } from 'react-hot-loader'
 

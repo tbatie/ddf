@@ -14,7 +14,7 @@ import {
   ThemeInterface,
   withTheme,
   ThemeProvider,
-} from '../../styles/styled-components'
+} from '@connexta/atlas/styled'
 import { hot } from 'react-hot-loader'
 
 type Props = {
@@ -33,4 +33,5 @@ const render = (props: Props) => {
   return <ThemeProvider theme={modifiedTheme}>{children}</ThemeProvider>
 }
 
+//@ts-ignore
 export default hot(module)(withTheme(render))

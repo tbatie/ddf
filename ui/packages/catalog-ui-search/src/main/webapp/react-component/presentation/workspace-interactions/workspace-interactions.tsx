@@ -11,7 +11,7 @@
  **/
 import * as React from 'react'
 import MenuAction from '../menu-action'
-import styled from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 import { readableColor } from 'polished'
 import { hot } from 'react-hot-loader'
 

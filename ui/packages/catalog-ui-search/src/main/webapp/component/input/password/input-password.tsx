@@ -10,7 +10,7 @@
  *
  **/
 import * as React from 'react'
-import styled from '../../../react-component/styles/styled-components'
+import styled from '@connexta/atlas/styled'
 import {
   buttonTypeEnum,
   Button,

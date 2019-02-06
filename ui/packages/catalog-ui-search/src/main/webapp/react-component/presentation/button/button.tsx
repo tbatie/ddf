@@ -10,8 +10,8 @@
  *
  **/
 import * as React from 'react'
-import styled from '../../styles/styled-components'
-import { ThemeInterface } from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
+import { ThemeInterface } from '@connexta/atlas/styled'
 import { readableColor, shade, tint, opacify } from 'polished'
 
 export enum buttonTypeEnum {
@@ -145,19 +145,6 @@ const Root = styled<RootProps, 'button'>('button')`
     opacity: ${props =>
       props.fadeUntilHover ? props.theme.minimumOpacity : 1};
 
-    &:hover:not([disabled]),
-    &:focus:not([disabled]) {
-        opacity: 1;
-        background: ${props => shadeFromProps(0.9, props)};
-        box-shadow: 0px 0px 2px ${props => shadeFromProps(0.9, props)};
-    }
-
-    &:active:not([disabled]) {
-        opacity: 1;
-        background: ${props => shadeFromProps(0.7, props)};
-        box-shadow: 0px 0px 2px ${props => shadeFromProps(0.7, props)};
-    }
-
     &:disabled {
         ${props => {
           if (props.buttonType !== buttonTypeEnum.neutral) {
@@ -174,6 +161,19 @@ const Root = styled<RootProps, 'button'>('button')`
                 ${props => shadeFromProps(0.9, props)} 20px
         );
         cursor: not-allowed;
+    }
+
+    &:hover:not([disabled]),
+    &:focus:not([disabled]) {
+        opacity: 1;
+        background: ${props => shadeFromProps(0.9, props)};
+        box-shadow: 0px 0px 2px ${props => shadeFromProps(0.9, props)};
+    }
+
+    &:active:not([disabled]) {
+        opacity: 1;
+        background: ${props => shadeFromProps(0.7, props)};
+        box-shadow: 0px 0px 2px ${props => shadeFromProps(0.7, props)};
     }
 `
 

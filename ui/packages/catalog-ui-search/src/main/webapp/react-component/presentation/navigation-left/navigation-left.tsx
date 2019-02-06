@@ -10,7 +10,7 @@
  *
  **/
 import * as React from 'react'
-import styled from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 import UnsavedIndicator from '../unsaved-indicator'
 const SlideoutLeftViewInstance = require('../../../component/singletons/slideout.left.view-instance.js')
 const NavigatorView = require('../../../component/navigator/navigator.view.js')

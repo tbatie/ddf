@@ -10,7 +10,7 @@
  *
  **/
 import { readableColor } from 'polished'
-import { css } from '../styled-components'
+import { css } from '@connexta/atlas/styled'
 
 export const ChangeBackground = newBackground => {
   return css`

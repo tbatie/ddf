@@ -21,6 +21,7 @@ const OpenlayersView = require('./maps/openlayers/openlayers.view.js')
 const CombinedMapView = require('./combined-map/combined-map.view.js')
 const HistogramView = require('./histogram/histogram.view.js')
 const TableView = require('./table/table-viz.view.js')
+const TimelineView = require('./timeline/timeline.view.js')
 const user = require('../singletons/user-instance.js')
 const maptype = require('../../js/maptype.js')
 
@@ -59,6 +60,8 @@ module.exports = Marionette.LayoutView.extend({
       case 'table':
         this.showTable()
         break
+      case 'timeline':
+        this.showTimeline()
     }
   },
   showOpenlayers: function() {
@@ -85,6 +88,13 @@ module.exports = Marionette.LayoutView.extend({
   showTable: function() {
     this.activeVisualization.show(
       new TableView({
+        selectionInterface: this.options.selectionInterface,
+      })
+    )
+  },
+  showTimeline: function() {
+    this.activeVisualization.show(
+      new Timeline({
         selectionInterface: this.options.selectionInterface,
       })
     )

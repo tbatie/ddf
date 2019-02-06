@@ -50,6 +50,12 @@ var configs = {
     componentName: 'histogram',
     componentState: {},
   },
+  timeline: {
+    title: 'Timeline',
+    type: 'component',
+    componentName: 'timeline',
+    componentState: {},
+  },
 }
 
 function unMaximize(contentItem) {
@@ -104,6 +110,12 @@ module.exports = Marionette.ItemView.extend({
       this.options.goldenLayout.createDragSource(
         this.el.querySelector('.choice-inspector'),
         configs.inspector
+      )
+    )
+    this.dragSources.push(
+      this.options.goldenLayout.createDragSource(
+        this.el.querySelector('.choice-timeline'),
+        configs.timeline
       )
     )
     this.listenToDragSources()

@@ -300,6 +300,11 @@ const setupEditor = (dispatch, getState) => {
       title: 'Table',
       icon: 'table',
     },
+    {
+      name: 'timeline',
+      title: 'Timeline',
+      icon: 'hourglass-half',
+    },
   ]
 
   let layout = new GoldenLayout(baseConf, '#layoutContainer')

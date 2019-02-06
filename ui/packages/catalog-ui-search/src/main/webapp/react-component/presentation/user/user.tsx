@@ -10,7 +10,7 @@
  *
  **/
 import * as React from 'react'
-import styled from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 import TextField from '../../../react-component/container/input-wrappers/text'
 import PasswordField from '../../../react-component/container/input-wrappers/password'
 import { Button, buttonTypeEnum } from '../../presentation/button'

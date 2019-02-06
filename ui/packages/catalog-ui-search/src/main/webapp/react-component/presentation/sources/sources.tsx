@@ -10,7 +10,7 @@
  *
  **/
 import * as React from 'react'
-import styled from '../../styles/styled-components'
+import styled from '@connexta/atlas/styled'
 import { ChangeBackground } from '../../styles/mixins/change-background'
 import SourceItem from '../source-item'
 import SourcesSummary from '../sources-summary'

@@ -27,6 +27,7 @@ var TableView = require('../visualization/table/table-viz.view.js')
 var InspectorView = require('../visualization/inspector/inspector.view.js')
 var OpenlayersView = require('../visualization/maps/openlayers/openlayers.view.js')
 var HistogramView = require('../visualization/histogram/histogram.view.js')
+var TimelineView = require('../visualization/timeline/timeline.view')
 var CombinedMapView = require('../visualization/combined-map/combined-map.view.js')
 var LowBandwidthMapView = require('../visualization/low-bandwidth-map/low-bandwidth-map.view.js')
 var Common = require('../../js/Common.js')
@@ -272,6 +273,7 @@ module.exports = Marionette.LayoutView.extend({
       desiredContainer: 'cesium',
     })
     registerComponent(this, 'histogram', HistogramView)
+    registerComponent(this, 'timeline', TimelineView)
     registerComponent(this, 'openlayers', LowBandwidthMapView, {
       desiredContainer: 'openlayers',
     })

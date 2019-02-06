@@ -166,7 +166,6 @@ const base = ({ alias = {}, env }) => ({
             loader: nodeResolve('stylelint-custom-processor-loader'),
           },
         ],
-        exclude: /node_modules/,
       },
     ],
   },

@@ -15,7 +15,7 @@ import {
   ThemeInterface,
   SpecificSizingInterface,
   ThemeColorInterface,
-} from '../../styles/styled-components'
+} from '@connexta/atlas/styled'
 const user = require('../../../component/singletons/user-instance.js')
 const Common = require('../../../js/Common.js')
 import withListenTo, { WithBackboneProps } from '../backbone-container'

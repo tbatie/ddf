@@ -9,7 +9,7 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  *
  **/
-import { css } from '../styled-components'
+import { css } from '@connexta/atlas/styled'
 
 export const Dropshadow = css`
   box-shadow: 0px 0px 2px 1px rgba(255, 255, 255, 0.4),
