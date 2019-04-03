@@ -69,11 +69,6 @@ class TimelineVisualization extends React.Component<Props, State> {
     var attrSelections = this.getAvailableDateAtrrs()
     var selectedAttr = this.getSelectedAttr(attrSelections, newAttrSelection)
     var points = this.getTimelinePoints(selectedAttr)
-
-    // console.log('================ NEW STATE ================')
-    // console.log('points: ' + JSON.stringify(points.map((v: any) => v.date)))
-    // console.log('attr options: ' + JSON.stringify(attrSelections))
-    // console.log('selected attr: ' + JSON.stringify(selectedAttr))
     return {
       points,
       selectedAttr,
@@ -167,12 +162,12 @@ class TimelineVisualization extends React.Component<Props, State> {
     return displayInfo
   }
 
-  onHover = (point: Point) => {
-    return this.pointToDisplayInfo(point)
-  }
+  onHover = (points: Point[]) => {
 
-  onHoverCluster = (points: Point[]) => {
+
     var pointsToPreview = points.slice(0, 5)
+    // var ele = points.map((p) => this.pointToDiv(p))
+
     var dataToDisplay: any[] = pointsToPreview.map(point =>
       this.pointToDisplayInfo(point)
     )
@@ -180,15 +175,11 @@ class TimelineVisualization extends React.Component<Props, State> {
       dataToDisplay.push({ 'hidden metacard': points.length - 5 })
     }
 
-    return dataToDisplay
+
+    return <div>on hover</div>
   }
 
-  onClick = (point: Point) => {
-    this.props.selectionInterface.clearSelectedResults()
-    this.props.selectionInterface.addSelectedResult(point.data)
-  }
-
-  onClickCluster = (points: Point[]) => {
+  onClick = (points: Point[]) => {
     this.props.selectionInterface.clearSelectedResults()
     this.props.selectionInterface.addSelectedResult(points.map(p => p.data))
   }
@@ -222,9 +213,7 @@ class TimelineVisualization extends React.Component<Props, State> {
         <Timeline
           value={this.state.points}
           onHover={this.onHover}
-          onHoverCluster={this.onHoverCluster}
           onClick={this.onClick}
-          onClickCluster={this.onClickCluster}
         />
       </div>
     )
