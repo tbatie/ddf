@@ -1,6 +1,7 @@
 // TODO - probably don't want to use this
 var metacardDefinitions = require('../../singletons/metacard-definitions.js')
-import Timeline from '@connexta/atlas/atoms/timeline'
+import Timeline, { Point } from '@connexta/atlas/atoms/timeline/timeline'
+
 import * as React from 'react'
 import { hot } from 'react-hot-loader'
 import EnumDropdown from '../../../react-component/container/input-wrappers/enum'
@@ -16,12 +17,6 @@ type Props = WithBackboneProps & {
 type Option = {
   label: string
   value: any
-}
-
-type Point = {
-  icon?: any
-  date: Date
-  data?: any
 }
 
 type State = {
@@ -54,6 +49,12 @@ class TimelineVisualization extends React.Component<Props, State> {
       this.onSearchResultsChange
     )
 
+    this.props.listenTo(
+      this.props.selectionInterface.getSelectedResults(),
+      'update add remove reset',
+      this.onSearchResultsChange
+    )
+
     this.state = this.getNewState()
   }
 
@@ -65,9 +66,9 @@ class TimelineVisualization extends React.Component<Props, State> {
     this.setState(this.getNewState())
   }
 
-  getNewState = (newAttrSelection?: string) => {
+  getNewState = (attrSelection?: string) => {
     var attrSelections = this.getAvailableDateAtrrs()
-    var selectedAttr = this.getSelectedAttr(attrSelections, newAttrSelection)
+    var selectedAttr = this.getSelectedAttr(attrSelections, attrSelection)
     var points = this.getTimelinePoints(selectedAttr)
     return {
       points,
@@ -76,7 +77,6 @@ class TimelineVisualization extends React.Component<Props, State> {
     }
   }
 
-  // TODO - should change scope on this, only should be called inside of getNewState since it requires the points to be updated with this filter as well
   getSelectedAttr = (attrSelections: any, newAttrSelection?: string) => {
     var selectedAttr: any
     if (attrSelections.length === 0) {
@@ -116,23 +116,30 @@ class TimelineVisualization extends React.Component<Props, State> {
   }
 
   getTimelinePoints = (selectedAttr: any) => {
-    var selectionInterface = this.props.selectionInterface
+    const selectionInterface = this.props.selectionInterface
     if (selectedAttr === undefined) {
       return []
     }
 
+    const selectedIds = selectionInterface
+      .getSelectedResults()
+      .map((m: any) => m.get('id'))
+
     return selectionInterface
       .getActiveSearchResults()
-      .reduce((list: any, r: any) => {
-        var attrValue = r
+      .reduce((list: any, r: any, i: number) => {
+        const attrValue = r
           .get('metacard')
           .get('properties')
           .toJSON()[selectedAttr.value]
 
         if (attrValue !== undefined) {
+          const selected = selectedIds.indexOf(r.get('id')) > -1
           list.push({
             date: new Date(attrValue),
             data: r,
+            selected: selected,
+            id: i,
           })
         }
 
@@ -162,9 +169,8 @@ class TimelineVisualization extends React.Component<Props, State> {
     return displayInfo
   }
 
+  // TODO - This should return a jsx element
   onHover = (points: Point[]) => {
-
-
     var pointsToPreview = points.slice(0, 5)
     // var ele = points.map((p) => this.pointToDiv(p))
 
@@ -175,25 +181,29 @@ class TimelineVisualization extends React.Component<Props, State> {
       dataToDisplay.push({ 'hidden metacard': points.length - 5 })
     }
 
-
     return <div>on hover</div>
   }
 
-  onClick = (points: Point[]) => {
-    this.props.selectionInterface.clearSelectedResults()
-    this.props.selectionInterface.addSelectedResult(points.map(p => p.data))
+  onClick = (toMatch: Point[]) => {
+    const selectionInterface = this.props.selectionInterface
+    var newPoints = this.state.points.map(p => {
+      if (toMatch.some(match => match.id === p.id)) {
+        p.selected = !p.selected
+      }
+
+      return p
+    })
+
+    this.setState({ points: newPoints })
+
+    const newSelectedResults = this.state.points
+      .filter(p => p.selected)
+      .map(p => p.data)
+    selectionInterface.clearSelectedResults()
+    selectionInterface.addSelectedResult(newSelectedResults)
   }
 
   render() {
-    // console.log('=================== RENDER STATE ===================')
-    // console.log('points: ' + JSON.stringify(points))
-    // console.log('attr options: ' + JSON.stringify(attrSelections))
-    // console.log('selected attr: ' + JSON.stringify(selectedAttr))
-
-    // console.log(
-    //   'active search results: ' +
-    //     JSON.stringify(this.props.selectionInterface.getActiveSearchResults())
-    // )
     if (this.props.selectionInterface.getActiveSearchResults().length === 0) {
       return <div>Please select a result set to display on the timeline.</div>
     }
